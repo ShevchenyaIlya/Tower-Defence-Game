@@ -2,13 +2,15 @@ import pygame
 from towers.tower import Tower
 import os
 import math
-from .tower import Menu
-import time
+from towers.image_collection import ImageCollection
 
-range_imgs = []
+"""range_imgs = []
 for index in range(2):
     range_imgs.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/support tower/1", "support_tower_1("
-                                                     + str(index) + ").png")), (90, 90)))
+                                                     + str(index) + ").png")), (90, 90)))"""
+
+range_imgs = ImageCollection("../game_assets/towers/support tower/1/", 3, 1, 90, 0, "support_tower_1_")
+range_imgs.download_tower()
 
 
 class RangeTower(Tower):
@@ -19,7 +21,7 @@ class RangeTower(Tower):
         super().__init__(x, y)
         self.range = 85
         self.effect = [0.2, 0.4]
-        self.tower_imgs = range_imgs[:]
+        self.tower_imgs = range_imgs.images[:]
         self.width = self.height = 90
         self.name = "range"
         self.price = 1000
@@ -54,11 +56,13 @@ class RangeTower(Tower):
             tower.range = tower.original_range + round(tower.range * self.effect[self.level - 1])
 
 
-damage_imgs = []
+"""damage_imgs = []
 for index in range(3, 5):
     damage_imgs.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/support tower/2",
                                                                              "support_tower_1("
-                                                                             + str(index) + ").png")), (100, 100)))
+                                                                             + str(index) + ").png")), (100, 100)))"""
+damage_imgs = ImageCollection("../game_assets/towers/support tower/2/", 3, 1, 100, 0, "support_tower_1_")
+damage_imgs.download_tower()
 
 
 class DamageTower(RangeTower):
@@ -68,7 +72,7 @@ class DamageTower(RangeTower):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.range = 75
-        self.tower_imgs = damage_imgs[:]
+        self.tower_imgs = damage_imgs.images[:]
         self.effect = [0.2, 0.4]
         self.width = self.height = 100
         self.name = "damage"

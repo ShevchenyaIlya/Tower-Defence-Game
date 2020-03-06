@@ -9,6 +9,7 @@ from enemies.goblin import Goblin
 from towers.archer_tower import ArcherTowerLong, ArcherTowerShort
 from towers.support_tower import RangeTower, DamageTower
 from menu.menu import VerticalMenu, PlayPauseButton
+from towers.image_collection import ControlImageCollection, ImageCollection
 import time
 import random
 import math
@@ -23,21 +24,31 @@ path = [(-10, 225), (14, 224), (90, 225), (165, 225), (216, 252), (269, 282), (3
         (412, 556), (288, 554), (163, 548), (98, 484), (81, 393), (18, 339), (-30, 335)]
 
 
-lives_img = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "heart2.png")), (56, 56))
-star_img = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (36, 36))
-side_img = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "vertical_menu_1.png")), (600, 125)), -90)
+# lives_img = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "heart2.png")), (56, 56))
+lives_img = ControlImageCollection("../game_assets/heart2.png", 56, 56).download_image()
+# star_img = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (36, 36))
+star_img = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
+# side_img = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "vertical_menu_1.png")), (600, 125)), -90)
+side_img = pygame.transform.rotate(ControlImageCollection("../game_assets/vertical_menu_1.png", 600, 125).download_image(), -90)
 
-play_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "play_button_1.png")), (75, 75))
+"""play_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "play_button_1.png")), (75, 75))
 pause_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "pause_button.png")), (75, 75))
-wave_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "wave.png")), (200, 75))
+wave_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "wave.png")), (200, 75))"""
+play_btn = ControlImageCollection("../game_assets/play_button_1.png", 75, 75).download_image()
+pause_btn = ControlImageCollection("../game_assets/pause_button.png", 75, 75).download_image()
+wave_bg = ControlImageCollection("../game_assets/wave.png", 200, 75).download_image()
 
-sound_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "music_icon.png")), (75, 75))
-sound_btn_off = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "no_music_icon.png")), (75, 75))
+"""sound_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "music_icon.png")), (75, 75))
+sound_btn_off = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "no_music_icon.png")), (75, 75))"""
+sound_btn = ControlImageCollection("../game_assets/music_icon.png", 75, 75).download_image()
+sound_btn_off = ControlImageCollection("../game_assets/no_music_icon.png", 75, 75).download_image()
 
-
-tower_icon_img = []
+"""tower_icon_img = []
 for index in range(1, 5):
-    tower_icon_img.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/tower image", "tower_icon_" + str(index) + ".png")), (64, 64)))
+    tower_icon_img.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/tower image", "tower_icon_" + str(index) + ".png")), (64, 64)))"""
+
+tower_icon_img = ImageCollection("../game_assets/towers/tower image/", 4, 1, 64, 0, "tower_icon_")
+tower_icon_img.download_tower()
 
 attack_tower_names = ["archer_long", "archer_short"]
 support_tower_names = ["range", "damage"]
@@ -75,7 +86,7 @@ class Game:
         self.attack_towers = []
         self.support_towers = []
         self.__lives = 10
-        self.__money = 2000
+        self.__money = 100000
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png"))
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__timer = time.time()
@@ -91,10 +102,10 @@ class Game:
         self.sound_button = PlayPauseButton(sound_btn, sound_btn_off, 90, self.__height - 85)
 
         self.menu = VerticalMenu(self.__width - side_img.get_width() + 80, 190, side_img)
-        self.menu.add_btn(tower_icon_img[3], "buy_archer_1", 500)
-        self.menu.add_btn(tower_icon_img[0], "buy_archer_2", 750)
-        self.menu.add_btn(tower_icon_img[2], "buy_damage", 1000)
-        self.menu.add_btn(tower_icon_img[1], "buy_range", 1000)
+        self.menu.add_btn(tower_icon_img.images[3], "buy_archer_1", 500)
+        self.menu.add_btn(tower_icon_img.images[0], "buy_archer_2", 750)
+        self.menu.add_btn(tower_icon_img.images[2], "buy_damage", 1000)
+        self.menu.add_btn(tower_icon_img.images[1], "buy_range", 1000)
 
         self.key_phrase_input = False
         self.__key_phrase = [109, 111, 110, 101, 121]  # money

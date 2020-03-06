@@ -3,25 +3,34 @@ from towers.tower import Tower
 import os
 import math
 from menu.menu import Menu
+from towers.image_collection import ImageCollection, ControlImageCollection
 
-menu_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "menu1.png")), (150, 75))
-upgrade_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "upgrade.png")), (50, 50))
+"""menu_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "menu1.png")), (150, 75))
+upgrade_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "upgrade.png")), (50, 50))"""
 
+menu_bg = ControlImageCollection("../game_assets/menu1.png", 150, 75).download_image()
+upgrade_btn = ControlImageCollection("../game_assets/upgrade.png", 50, 50).download_image()
 
-tower_imgs1 = []
+"""tower_imgs1 = []
 archer_imgs1 = []
 # load archer tower images
 for x in range(3, 6):
     add_str = str(x)
     tower_imgs1.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/archer tower/1",
                                                                              "archer_tower_2(" + add_str + ")"
-                                                                             + ".png")), (100, 100)))
+                                                                             + ".png")), (100, 100)))"""
 
-for x in range(6, 12):
+tower_imgs = ImageCollection("../game_assets/towers/archer tower/1/", 3, 1, 100, 0, "archer_tower_2_")
+tower_imgs.download_tower()
+
+"""for x in range(6, 12):
     add_str = str(x)
     archer_imgs1.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/archer/1",
                                                                               "New Project(" + add_str + ")"
-                                                                              + ".png")), (44, 44)))
+                                                                              + ".png")), (44, 44)))"""
+
+archer_imgs = ImageCollection("../game_assets/towers/archer/1/", 6, 1, 44, 0, "archer_animation_")
+archer_imgs.download_tower()
 
 
 class ArcherTowerLong(Tower):
@@ -29,8 +38,8 @@ class ArcherTowerLong(Tower):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.tower_imgs = tower_imgs1[:]
-        self.archer_imgs = archer_imgs1[:]
+        self.tower_imgs = tower_imgs.images[:]
+        self.archer_imgs = archer_imgs.images[:]
         self.archer_count = 0
         self.price = 500
         self.range = 150
@@ -122,26 +131,30 @@ class ArcherTowerLong(Tower):
         return money
 
 # load short archer tower images
-tower_imgs2 = []
+"""tower_imgs2 = []
 archer_imgs2 = []
 for x in range(0, 3):
     add_str = str(x)
     tower_imgs2.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/archer tower/2",
                                                                              "archer_tower_2(" + add_str + ")"
-                                                                             + ".png")), (100, 100)))
+                                                                             + ".png")), (100, 100)))"""
+tower_imgs_sibling = ImageCollection("../game_assets/towers/archer tower/2/", 3, 1, 100, 0, "archer_tower_2_")
+tower_imgs_sibling.download_tower()
 
-for x in range(0, 6):
+"""for x in range(0, 6):
     add_str = str(x)
     archer_imgs2.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/archer/2",
                                                                               "New Project(" + add_str + ")"
-                                                                              + ".png")), (44, 44)))
+                                                                              + ".png")), (44, 44)))"""
+archer_imgs_sibling = ImageCollection("../game_assets/towers/archer/2/", 6, 1, 44, 0, "archer_animation_")
+archer_imgs_sibling.download_tower()
 
 
 class ArcherTowerShort(ArcherTowerLong):
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.tower_imgs = tower_imgs2[:]
-        self.archer_imgs = archer_imgs2[:]
+        self.tower_imgs = tower_imgs_sibling.images[:]
+        self.archer_imgs = archer_imgs_sibling.images[:]
         self.archer_count = 0
         self.range = 120
         self.price = 750

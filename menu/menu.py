@@ -1,11 +1,13 @@
 import pygame
-import os
 from towers.control_object import ButtonObject, MenuObject
 from towers.interfaces import ILocation
+from towers.image_collection import ControlImageCollection
 
 
-star = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (50, 50))
-star_2 = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (36, 36))
+"""star = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (50, 50))
+star_2 = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (36, 36))"""
+big_star = ControlImageCollection("../game_assets/star1.png", 50, 50).download_image()
+small_star = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
 
 
 class Button(ButtonObject, ILocation):
@@ -90,9 +92,9 @@ class Menu(MenuObject, ILocation):
         win.blit(self.bg, (self.x - self.bg.get_width() / 2, self.y - 120))
         for item in self.buttons:
             item.draw(win)
-            win.blit(star, (item.x + item.width + 3, item.y - 3))
+            win.blit(big_star, (item.x + item.width + 3, item.y - 3))
             text = self.font.render(str(self.item_cost[self.tower.level - 1]), 1, (255, 255, 255))
-            win.blit(text, (item.x + item.width + 32 - text.get_width() / 2, item.y + star.get_height() - 17))
+            win.blit(text, (item.x + item.width + 32 - text.get_width() / 2, item.y + big_star.get_height() - 17))
 
     def get_item_cost(self):
         """
@@ -195,9 +197,9 @@ class VerticalMenu(Menu):
         win.blit(self.bg, (self.x - self.bg.get_width() / 2, self.y - 110))
         for item in self.buttons:
             VerticalButton.draw(item, win)
-            win.blit(star_2, (item.x + item.width // 2 + 2, item.y + item.height - 20))
+            win.blit(small_star, (item.x + item.width // 2 + 2, item.y + item.height - 20))
             text = self.font.render(str(item.cost), 1, (255, 255, 255))
-            win.blit(text, (item.x - text.get_width() // 2 + 20, item.y + star.get_height() + 7))
+            win.blit(text, (item.x - text.get_width() // 2 + 20, item.y + small_star.get_height() + 21))
 
     def get_item_cost(self, name):
         """

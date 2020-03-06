@@ -1,12 +1,14 @@
 import pygame
 from menu.menu import Menu
-import os
 import math
 from towers.positional_object import PositionalObject
 from towers.interfaces import ILocation
+from towers.image_collection import ControlImageCollection
 
-menu_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "menu1.png")), (150, 75))
-upgrade_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "upgrade.png")), (50, 50))
+"""menu_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "menu1.png")), (150, 75))
+upgrade_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "upgrade.png")), (50, 50))"""
+menu_background = ControlImageCollection("../game_assets/menu1.png", 150, 75).download_image()
+button_background = ControlImageCollection("../game_assets/upgrade.png", 50, 50).download_image()
 
 
 class Tower(PositionalObject, ILocation):
@@ -26,8 +28,8 @@ class Tower(PositionalObject, ILocation):
         self.is_collide = False
 
         # define menu and buttons
-        self.menu = Menu(self, self.x, self.y, menu_bg, [2000, "Max"])
-        self.menu.add_btn(upgrade_btn, "Upgrade")
+        self.menu = Menu(self, self.x, self.y, menu_background, [2000, "Max"])
+        self.menu.add_btn(button_background, "Upgrade")
 
         self.tower_imgs = []
         self.damage = 1

@@ -13,6 +13,7 @@ class ImageCollection:
         self.identifier = identifier
         self.loaded = False
 
+    def download_images(self):
         try:
             for index in range(self.number_of_imgs):
                 add_str = str(index)
@@ -24,7 +25,18 @@ class ImageCollection:
             self.loaded = True
         except pygame.error:
             self.loaded = False
-            self.images = None
+            raise pygame.error("Images does not loaded!")
+
+    def download_tower(self):
+        try:
+            for x in range(self.load_index, self.load_index + self.number_of_imgs):
+                add_str = str(x)
+                self.images.append(
+                    pygame.transform.scale(pygame.image.load(self.path + self.identifier + add_str + ".png"), (self.image_size, self.image_size)))
+            self.loaded = True
+        except pygame.error:
+            self.loaded = False
+            raise pygame.error("Images does not loaded!")
 
     def __contains__(self, item):
         return item in self.images
@@ -37,3 +49,18 @@ class ImageCollection:
 
     def __del__(self):
         del self.images
+
+
+class ControlImageCollection:
+    def __init__(self, path, width, height):
+        self.image = None
+        self.path = path
+        self.width = width
+        self.height = height
+
+    def download_image(self):
+        try:
+            self.image = pygame.transform.scale(pygame.image.load(self.path), (self.width, self.height))
+            return self.image
+        except pygame.error:
+            raise pygame.error("Images does not loaded!")
