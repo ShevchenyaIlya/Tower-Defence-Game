@@ -1,0 +1,35 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="flash0.ai_0/tower/&amp;#060Path&amp;#062_3" itemID="5a7ae9aa-0000049a" lastModified="1518004650">
+  <timeline>
+    <DOMTimeline name="&amp;#060Path&amp;#062_3">
+      <layers>
+        <DOMLayer name="Layer_1" color="#00FFFF" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isDrawingObject="true">
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#161313"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!408 3[377 -1 328 3!328 3[258 8 248 8!248 8[208 10 153 7!153 7[90 2 58 0!58 0[38 -1 25 14!25 14[14 28 12 49!12 49[-1 65 0 87!0 87[1 110 20 120!20 120[58 139 91 146!91 146[211 187 336 191!336 191[404 193 435 184!435 184[490 168 501 112
+!501 112[512 62 480 32!480 32[455 8 408 3"/>
+                    <Edge cubics="!408 3(;356,-3 301,7 248,8q408 3Q377 -1q328 3Q258 8q248 8);"/>
+                    <Edge cubics="!248 8(;184,11 122,4 58,0q248 8Q208 10q153 7Q90 2q58 0);"/>
+                    <Edge cubics="!58 0(;30,-1 14,23 12,49q58 0Q38 -1q25 14Q14 28q12 49);"/>
+                    <Edge cubics="!12 49(;-4,69 -7,106 20,120q12 49Q-1 65q0 87Q1 110q20 120);"/>
+                    <Edge cubics="!20 120(;44,132 67,141 91,146q20 120Q58 139q91 146);"/>
+                    <Edge cubics="!91 146(;171,173 253,188 336,191q91 146Q211 187q336 191);"/>
+                    <Edge cubics="!336 191(;396,193 484,197 501,112q336 191Q404 193q435 184Q490 168q501 112);"/>
+                    <Edge cubics="!501 112(;517,39 461,9 408,3q501 112Q512 62q480 32Q455 8q408 3);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
