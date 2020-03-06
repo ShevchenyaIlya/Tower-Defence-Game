@@ -12,6 +12,7 @@ for x in range(20):
                                                                       + add_str + ".png")), (64, 64)))"""
 
 imgs = ImageCollection("enemies/", 20, 0, 64, 1, "_enemies_1_run_0")
+imgs.download_images()
 
 
 class Scorpion(enemy.Enemy):

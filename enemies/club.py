@@ -12,6 +12,7 @@ for x in range(20):
     imgs.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/enemies/5", "5_enemies_1_run_0"
                                                                       + add_str + ".png")), (64, 64)))"""
 imgs = ImageCollection("enemies/", 20, 0, 64, 5, "_enemies_1_run_0")
+imgs.download_images()
 
 
 class Club(enemy.Enemy):
