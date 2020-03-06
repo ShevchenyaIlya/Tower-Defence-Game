@@ -5,8 +5,7 @@ from towers.positional_object import PositionalObject
 from towers.interfaces import ILocation
 from towers.image_collection import ControlImageCollection
 
-"""menu_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "menu1.png")), (150, 75))
-upgrade_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "upgrade.png")), (50, 50))"""
+
 menu_background = ControlImageCollection("../game_assets/menu1.png", 150, 75).download_image()
 button_background = ControlImageCollection("../game_assets/upgrade.png", 50, 50).download_image()
 

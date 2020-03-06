@@ -24,28 +24,16 @@ path = [(-10, 225), (14, 224), (90, 225), (165, 225), (216, 252), (269, 282), (3
         (412, 556), (288, 554), (163, 548), (98, 484), (81, 393), (18, 339), (-30, 335)]
 
 
-# lives_img = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "heart2.png")), (56, 56))
 lives_img = ControlImageCollection("../game_assets/heart2.png", 56, 56).download_image()
-# star_img = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (36, 36))
 star_img = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
-# side_img = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "vertical_menu_1.png")), (600, 125)), -90)
 side_img = pygame.transform.rotate(ControlImageCollection("../game_assets/vertical_menu_1.png", 600, 125).download_image(), -90)
 
-"""play_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "play_button_1.png")), (75, 75))
-pause_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "pause_button.png")), (75, 75))
-wave_bg = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "wave.png")), (200, 75))"""
 play_btn = ControlImageCollection("../game_assets/play_button_1.png", 75, 75).download_image()
 pause_btn = ControlImageCollection("../game_assets/pause_button.png", 75, 75).download_image()
 wave_bg = ControlImageCollection("../game_assets/wave.png", 200, 75).download_image()
 
-"""sound_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "music_icon.png")), (75, 75))
-sound_btn_off = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "no_music_icon.png")), (75, 75))"""
 sound_btn = ControlImageCollection("../game_assets/music_icon.png", 75, 75).download_image()
 sound_btn_off = ControlImageCollection("../game_assets/no_music_icon.png", 75, 75).download_image()
-
-"""tower_icon_img = []
-for index in range(1, 5):
-    tower_icon_img.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/tower image", "tower_icon_" + str(index) + ".png")), (64, 64)))"""
 
 tower_icon_img = ImageCollection("../game_assets/towers/tower image/", 4, 1, 64, 0, "tower_icon_")
 tower_icon_img.download_tower()
@@ -318,13 +306,6 @@ class Game:
             second_closest_point = prev_point
         else:
             second_closest_point = next_point
-
-        """second_closest_point = (path[0])
-        for point in path[1:]:
-            if point != first_closest_point:
-                dis = math.sqrt((point[0] - tower_x) ** 2 + (point[1] - tower_y) ** 2)
-                if math.sqrt((second_closest_point[0] - tower_x) ** 2 + (second_closest_point[1] - tower_y) ** 2) > dis:
-                    second_closest_point = (point[0], point[1])"""
 
         # |ax + by + c|/(sqrt(a^2 + b^2))
         a = second_closest_point[1] - first_closest_point[1]

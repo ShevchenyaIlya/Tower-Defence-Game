@@ -4,8 +4,6 @@ from towers.interfaces import ILocation
 from towers.image_collection import ControlImageCollection
 
 
-"""star = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (50, 50))
-star_2 = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "star1.png")), (36, 36))"""
 big_star = ControlImageCollection("../game_assets/star1.png", 50, 50).download_image()
 small_star = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
 

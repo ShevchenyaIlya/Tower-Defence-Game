@@ -4,10 +4,6 @@ import os
 import math
 from towers.image_collection import ImageCollection
 
-"""range_imgs = []
-for index in range(2):
-    range_imgs.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/support tower/1", "support_tower_1("
-                                                     + str(index) + ").png")), (90, 90)))"""
 
 range_imgs = ImageCollection("../game_assets/towers/support tower/1/", 3, 1, 90, 0, "support_tower_1_")
 range_imgs.download_tower()
@@ -56,11 +52,6 @@ class RangeTower(Tower):
             tower.range = tower.original_range + round(tower.range * self.effect[self.level - 1])
 
 
-"""damage_imgs = []
-for index in range(3, 5):
-    damage_imgs.append(pygame.transform.scale(pygame.image.load(os.path.join("../game_assets/towers/support tower/2",
-                                                                             "support_tower_1("
-                                                                             + str(index) + ").png")), (100, 100)))"""
 damage_imgs = ImageCollection("../game_assets/towers/support tower/2/", 3, 1, 100, 0, "support_tower_1_")
 damage_imgs.download_tower()
 

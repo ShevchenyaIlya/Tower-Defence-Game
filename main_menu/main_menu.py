@@ -4,8 +4,6 @@ from towers.game import Game
 from towers.image_collection import ControlImageCollection
 
 
-"""start_btn = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "start_menu_button.png")), (250, 350))
-logo = pygame.transform.scale(pygame.image.load(os.path.join("../game_assets", "game_logo_1.png")), (1000, 250))"""
 start_btn = ControlImageCollection("../game_assets/start_menu_button.png", 250, 350).download_image()
 logo = ControlImageCollection("../game_assets/game_logo_1.png", 1000, 250).download_image()
 
