@@ -2,7 +2,7 @@ import pygame
 from menu.menu import Menu
 import math
 from towers.positional_object import PositionalObject
-from towers.interfaces import ILocation
+from towers.interfaces import ILocation, IUpgradable
 from towers.image_collection import ControlImageCollection
 
 
@@ -10,7 +10,7 @@ menu_background = ControlImageCollection("../game_assets/menu1.png", 150, 75).do
 button_background = ControlImageCollection("../game_assets/upgrade.png", 50, 50).download_image()
 
 
-class Tower(PositionalObject, ILocation):
+class Tower(PositionalObject, ILocation, IUpgradable):
     """
     Abstract class for towers
     """

@@ -1,8 +1,9 @@
 import pygame
 import os
+from collections import Container
 
 
-class ImageCollection:
+class ImageCollection(Container):
     def __init__(self, path, count, start_index, image_size, directory, identifier):
         self.images = []
         self.number_of_imgs = count

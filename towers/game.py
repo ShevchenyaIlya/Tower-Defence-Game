@@ -8,13 +8,14 @@ from enemies.sword import Sword
 from enemies.goblin import Goblin
 from towers.archer_tower import ArcherTowerLong, ArcherTowerShort
 from towers.support_tower import RangeTower, DamageTower
+from traps.traps import KillTrap, StopTrap
 from menu.menu import VerticalMenu, PlayPauseButton
 from towers.image_collection import ControlImageCollection, ImageCollection
 import time
 import random
 import math
 pygame.font.init()
-pygame.mixer.pre_init(22050, -16, 2, 128)
+pygame.mixer.pre_init(22050, -16, 2, 64)
 pygame.mixer.init()
 pygame.init()
 
@@ -73,6 +74,7 @@ class Game:
         self.enemies = []
         self.attack_towers = []
         self.support_towers = []
+        self.traps = [StopTrap(800, 450), KillTrap(400, 260)]
         self.__lives = 10
         self.__money = 100000
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png"))
@@ -82,7 +84,7 @@ class Game:
         self.selected_tower = None
         self.object_orientation = []
         self.moving_object = None
-        self.__wave = 1
+        self.__wave = 12
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
@@ -121,6 +123,7 @@ class Game:
     def run(self):
         pygame.mixer.music.play(loops=-1)
         run = True
+
         clock = pygame.time.Clock()
         while run:
             clock.tick(500)
@@ -323,6 +326,10 @@ class Game:
 
         """for point in path:
             pygame.draw.circle(self.win, (255, 0, 0), point, 3)"""
+
+        # draw trap (DELETE)
+        for trap in self.traps:
+            trap.draw(self.win)
 
         # draw placement rings
         if self.moving_object:

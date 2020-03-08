@@ -1,10 +1,10 @@
 import pygame
 import math
 from towers.positional_object import PositionalObject
-from towers.interfaces import ILocation
+from towers.interfaces import ILocation, IMovable
 
 
-class Enemy(PositionalObject, ILocation):
+class Enemy(PositionalObject, ILocation, IMovable):
     def __init__(self):
         super().__init__()
         self.width = 64
