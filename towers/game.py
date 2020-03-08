@@ -36,6 +36,10 @@ wave_bg = ControlImageCollection("../game_assets/wave.png", 200, 75).download_im
 sound_btn = ControlImageCollection("../game_assets/music_icon.png", 75, 75).download_image()
 sound_btn_off = ControlImageCollection("../game_assets/no_music_icon.png", 75, 75).download_image()
 
+kill_trap_img = ControlImageCollection("../game_assets/traps_icon_3.png", 90, 90).download_image()
+stop_trap_img = ControlImageCollection("../game_assets/traps_icon_1.png", 90, 90).download_image()
+destroying_trap_img = ControlImageCollection("../game_assets/traps_icon_2.png", 90, 90).download_image()
+
 tower_icon_img = ImageCollection("../game_assets/towers/tower image/", 4, 1, 64, 0, "tower_icon_")
 tower_icon_img.download_tower()
 
@@ -74,7 +78,7 @@ class Game:
         self.enemies = []
         self.attack_towers = []
         self.support_towers = []
-        self.traps = [StopTrap(800, 450), KillTrap(400, 260)]
+        self.traps = []
         self.__lives = 10
         self.__money = 100000
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png"))
@@ -90,6 +94,10 @@ class Game:
         self.music_on = True
         self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 10, self.__height - 85)
         self.sound_button = PlayPauseButton(sound_btn, sound_btn_off, 90, self.__height - 85)
+
+        self.stop_trap_btn = PlayPauseButton(stop_trap_img, stop_trap_img, 1000, self.__height - 90)
+        self.kill_trap_btn = PlayPauseButton(kill_trap_img, kill_trap_img, 915, self.__height - 90)
+        self.destroy_trap_btn = PlayPauseButton(destroying_trap_img, destroying_trap_img, 835, self.__height - 90)
 
         self.menu = VerticalMenu(self.__width - side_img.get_width() + 80, 190, side_img)
         self.menu.add_btn(tower_icon_img.images[3], "buy_archer_1", 500)
@@ -327,7 +335,7 @@ class Game:
         """for point in path:
             pygame.draw.circle(self.win, (255, 0, 0), point, 3)"""
 
-        # draw trap (DELETE)
+        # draw trap
         for trap in self.traps:
             trap.draw(self.win)
 
@@ -365,6 +373,11 @@ class Game:
 
         # draw play/pause button
         self.play_pause_button.draw(self.win)
+
+        # draw traps buttons
+        self.stop_trap_btn.draw(self.win)
+        self.kill_trap_btn.draw(self.win)
+        self.destroy_trap_btn.draw(self.win)
 
         # draw music toggle button
         self.sound_button.draw(self.win)

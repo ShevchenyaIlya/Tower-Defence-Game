@@ -25,3 +25,8 @@ class StopTrap(Trap):
 class KillTrap(Trap):
     def __init__(self, x, y):
         super().__init__(x, y, trap)
+
+
+class DestroyingTrap(Trap):
+    def __init__(self, x, y):
+        super().__init__(x, y, trap)
