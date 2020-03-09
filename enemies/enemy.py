@@ -11,6 +11,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.height = 64
         self.animation_count = 0
         self.health = 1
+        self.damage = 0
         self.vel = 3
         self.path = [(-10, 225), (14, 224), (165, 225), (216, 252), (269, 282), (555, 284), (619, 248), (639, 179),
                      (687, 74), (750, 52), (813, 70), (852, 116), (870, 187), (911, 257), (983, 276), (1055, 308),
@@ -24,9 +25,12 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.move_count = 0
         self.move_dis = 0
         self.imgs = []
+        self.attack_imgs = []
         self.flipped = False
         self.max_health = 0
         self.speed_increase = 1.2
+        self.stop_move = False
+        self.stop_by_trap = None
 
     def get_position(self):
         return self.x, self.y
@@ -37,7 +41,11 @@ class Enemy(PositionalObject, ILocation, IMovable):
         :param win: surface
         :return: None
         """
-        self.img = self.imgs[self.animation_count]
+        if self.stop_by_trap:
+            print("Atack")
+            self.img = self.attack_imgs[self.animation_count]
+        else:
+            self.img = self.imgs[self.animation_count]
 
         win.blit(self.img, (self.x - self.img.get_width() / 2, self.y - self.img.get_height() / 2 - 35))
         self.draw_health_bar(win)
@@ -123,3 +131,8 @@ class Enemy(PositionalObject, ILocation, IMovable):
         if self.health <= 0:
             return True
         return False
+
+    def abc(self):
+        self.animation_count += 1
+        if self.animation_count >= len(self.imgs):
+            self.animation_count = 0

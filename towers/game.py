@@ -8,7 +8,7 @@ from enemies.sword import Sword
 from enemies.goblin import Goblin
 from towers.archer_tower import ArcherTowerLong, ArcherTowerShort
 from towers.support_tower import RangeTower, DamageTower
-from traps.traps import KillTrap, StopTrap
+from traps.traps import KillTrap, StopTrap, DestroyTrap
 from menu.menu import VerticalMenu, PlayPauseButton
 from towers.image_collection import ControlImageCollection, ImageCollection
 import time
@@ -32,6 +32,7 @@ side_img = pygame.transform.rotate(ControlImageCollection("../game_assets/vertic
 play_btn = ControlImageCollection("../game_assets/play_button_1.png", 75, 75).download_image()
 pause_btn = ControlImageCollection("../game_assets/pause_button.png", 75, 75).download_image()
 wave_bg = ControlImageCollection("../game_assets/wave.png", 200, 75).download_image()
+small_star = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
 
 sound_btn = ControlImageCollection("../game_assets/music_icon.png", 75, 75).download_image()
 sound_btn_off = ControlImageCollection("../game_assets/no_music_icon.png", 75, 75).download_image()
@@ -81,29 +82,30 @@ class Game:
         self.traps = []
         self.__lives = 10
         self.__money = 100000
-        self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png"))
+        self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__timer = time.time()
         self.life_font = pygame.font.SysFont("life count", 45)
         self.selected_tower = None
         self.object_orientation = []
         self.moving_object = None
-        self.__wave = 12
+        self.moving_effect = None
+        self.__wave = 8
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
-        self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 10, self.__height - 85)
-        self.sound_button = PlayPauseButton(sound_btn, sound_btn_off, 90, self.__height - 85)
+        self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(), pause_btn.convert_alpha(), 10, self.__height - 85)
+        self.sound_button = PlayPauseButton(sound_btn.convert_alpha(), sound_btn_off.convert_alpha(), 90, self.__height - 85)
 
-        self.stop_trap_btn = PlayPauseButton(stop_trap_img, stop_trap_img, 1000, self.__height - 90)
-        self.kill_trap_btn = PlayPauseButton(kill_trap_img, kill_trap_img, 915, self.__height - 90)
-        self.destroy_trap_btn = PlayPauseButton(destroying_trap_img, destroying_trap_img, 835, self.__height - 90)
+        self.stop_trap_btn = PlayPauseButton(stop_trap_img.convert_alpha(), stop_trap_img.convert_alpha(), 1000, self.__height - 90)
+        # self.kill_trap_btn = PlayPauseButton(kill_trap_img.convert_alpha(), kill_trap_img.convert_alpha(), 915, self.__height - 90)
+        self.destroy_trap_btn = PlayPauseButton(destroying_trap_img.convert_alpha(), destroying_trap_img.convert_alpha(), 915, self.__height - 90)
 
         self.menu = VerticalMenu(self.__width - side_img.get_width() + 80, 190, side_img)
-        self.menu.add_btn(tower_icon_img.images[3], "buy_archer_1", 500)
-        self.menu.add_btn(tower_icon_img.images[0], "buy_archer_2", 750)
-        self.menu.add_btn(tower_icon_img.images[2], "buy_damage", 1000)
-        self.menu.add_btn(tower_icon_img.images[1], "buy_range", 1000)
+        self.menu.add_btn(tower_icon_img.images[3].convert_alpha(), "buy_archer_1", 500)
+        self.menu.add_btn(tower_icon_img.images[0].convert_alpha(), "buy_archer_2", 750)
+        self.menu.add_btn(tower_icon_img.images[2].convert_alpha(), "buy_damage", 1000)
+        self.menu.add_btn(tower_icon_img.images[1].convert_alpha(), "buy_range", 1000)
 
         self.key_phrase_input = False
         self.__key_phrase = [109, 111, 110, 101, 121]  # money
@@ -134,7 +136,7 @@ class Game:
 
         clock = pygame.time.Clock()
         while run:
-            clock.tick(500)
+            clock.tick(100)
 
             if not self.pause:
                 # generate monsters
@@ -144,12 +146,20 @@ class Game:
 
             pos = pygame.mouse.get_pos()
 
+            # check for moving effect
+            if self.moving_effect:
+                self.moving_effect.move(pos[0], pos[1])
+                if Game.point_to_line():
+                    self.moving_effect.place_color = (255, 0, 0, 100)
+                else:
+                    self.moving_effect.place_color = (0, 255, 0, 100)
+
             # check for moving object
             if self.moving_object:
                 self.moving_object.move(pos[0], pos[1])
                 tower_list = self.attack_towers[:] + self.support_towers[:]
                 collide = False
-                if not Game.point_to_line(self.moving_object):
+                if not Game.point_to_line():
                     collide = True
                     self.moving_object.place_color = (255, 0, 0, 100)
                 else:
@@ -175,6 +185,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == 96:  #
                         self.key_phrase_input = True
+                        self.moving_effect = None
 
                     if event.key == 13:
                         if len(self.__key_phrase) == len(self.input_key_phrase) and self.__key_phrase == self.input_key_phrase:
@@ -186,6 +197,19 @@ class Game:
                         self.input_key_phrase.append(event.key)
 
                 if event.type == pygame.MOUSEBUTTONUP:
+                    if self.moving_effect:
+                        if event.button == 3:
+                            self.moving_effect = None
+                        else:
+                            destroy = False
+                            if not Game.point_to_line():
+                                self.traps.append(self.moving_effect)
+                                self.__money -= self.moving_effect.cost
+                                destroy = True
+
+                            if destroy:
+                                self.moving_effect = None
+
                     # if your moving an object and click
                     if self.moving_object:
                         not_allowed = False
@@ -194,8 +218,15 @@ class Game:
                             if tower.collide(self.moving_object):
                                 not_allowed = True
 
+                        # check if you try to place something on vertical menu surface
+                        is_behind_menu = all(
+                            [1110 < pos[0] < 1250, 120 < pos[1] < 670])
+
+                        if is_behind_menu:
+                            not_allowed = True
+
                         not_place_tower = False
-                        if not not_allowed and Game.point_to_line(self.moving_object):
+                        if not not_allowed and Game.point_to_line():
                             if self.moving_object.name in attack_tower_names:
                                 self.attack_towers.append(self.moving_object)
                             elif self.moving_object.name in support_tower_names:
@@ -217,6 +248,11 @@ class Game:
                             self.moving_object = None
 
                     else:
+                        if self.stop_trap_btn.click(pos[0], pos[1]):
+                            self.add_trap("stop_trap")
+                        elif self.destroy_trap_btn.click(pos[0], pos[1]):
+                            self.add_trap("destroy_trap")
+
                         # check for play or pause
                         if self.play_pause_button.click(pos[0], pos[1]):
                             self.pause = not self.pause
@@ -267,12 +303,19 @@ class Game:
                                     tw.selected = False
 
             if not self.pause:
+                # loop through traps
+                for trap in self.traps:
+                    trap.stop_enemy(self.enemies)
+
                 # loop through enemies
                 to_del = []
                 for en in self.enemies:
-                    en.move()
-                    if en.x < -15:
-                        to_del.append(en)
+                    if not en.stop_by_trap:
+                        en.move()
+                        if en.x < -15:
+                            to_del.append(en)
+                    else:
+                        en.abc()
 
                 # delete all enemies off the screen
                 for d in to_del:
@@ -296,10 +339,9 @@ class Game:
         pygame.quit()
 
     @staticmethod
-    def point_to_line(tower):
+    def point_to_line():
         """
         Returns if you can place tower based on distance from path
-        :param tower: Tower
         :return: Bool
         """
         # find two closest points
@@ -310,13 +352,17 @@ class Game:
             dis = math.sqrt((point[0] - tower_x) ** 2 + (point[1] - tower_y) ** 2)
             if math.sqrt((first_closest_point[0] - tower_x) ** 2 + (first_closest_point[1] - tower_y) ** 2) > dis:
                 first_closest_point = (point[0], point[1], position)
-        prev_point, next_point = path[first_closest_point[2] - 1], path[first_closest_point[2] + 1]
-        first_distance = math.sqrt((prev_point[0] - tower_x) ** 2 + (prev_point[1] - tower_y) ** 2)
-        second_distance = math.sqrt((next_point[0] - tower_x) ** 2 + (next_point[1] - tower_y) ** 2)
-        if first_distance > second_distance:
-            second_closest_point = prev_point
+
+        if (first_closest_point[0], first_closest_point[1]) != path[0]:
+            prev_point, next_point = path[first_closest_point[2] - 1], path[first_closest_point[2] + 1]
+            first_distance = math.sqrt((prev_point[0] - tower_x) ** 2 + (prev_point[1] - tower_y) ** 2)
+            second_distance = math.sqrt((next_point[0] - tower_x) ** 2 + (next_point[1] - tower_y) ** 2)
+            if first_distance > second_distance:
+                second_closest_point = prev_point
+            else:
+                second_closest_point = next_point
         else:
-            second_closest_point = next_point
+            second_closest_point = path[1]
 
         # |ax + by + c|/(sqrt(a^2 + b^2))
         a = second_closest_point[1] - first_closest_point[1]
@@ -336,8 +382,8 @@ class Game:
             pygame.draw.circle(self.win, (255, 0, 0), point, 3)"""
 
         # draw trap
-        for trap in self.traps:
-            trap.draw(self.win)
+        """for trap in self.traps:
+            trap.draw(self.win)"""
 
         # draw placement rings
         if self.moving_object:
@@ -348,7 +394,15 @@ class Game:
 
             self.moving_object.draw_placement(self.win)
 
-        # draw attack towers
+        if self.moving_effect:
+            self.moving_effect.draw_placement(self.win)
+
+        # sort such objects for y coordinate and draw them in such sequence
+        object_list = self.attack_towers[:] + self.support_towers[:] + self.enemies[:] + self.traps[:]
+        object_list.sort(key=lambda x: x.y, reverse=False)
+        for element in object_list:
+            element.draw(self.win)
+        """# draw attack towers
         for tw in self.attack_towers:
             tw.draw(self.win)
 
@@ -358,7 +412,7 @@ class Game:
 
         # draw enemies
         for en in self.enemies:
-            en.draw(self.win)
+            en.draw(self.win)"""
 
         # draw vertical menu
         self.menu.draw(self.win)
@@ -371,13 +425,21 @@ class Game:
         if self.moving_object:
             self.moving_object.draw(self.win)
 
+        # draw moving effect
+        if self.moving_effect:
+            self.moving_effect.draw(self.win)
+
         # draw play/pause button
         self.play_pause_button.draw(self.win)
 
         # draw traps buttons
         self.stop_trap_btn.draw(self.win)
-        self.kill_trap_btn.draw(self.win)
+        text = self.stop_trap_btn.font.render("150", 1, (255, 255, 255))
+        self.win.blit(text, (self.stop_trap_btn.x + 35, self.stop_trap_btn.y + self.stop_trap_btn.height // 2 + 25))
+        # self.kill_trap_btn.draw(self.win)
         self.destroy_trap_btn.draw(self.win)
+        text = self.destroy_trap_btn.font.render("200", 1, (255, 255, 255))
+        self.win.blit(text, (self.destroy_trap_btn.x + 35, self.destroy_trap_btn.y + self.destroy_trap_btn.height // 2 + 25))
 
         # draw music toggle button
         self.sound_button.draw(self.win)
@@ -417,10 +479,20 @@ class Game:
         except Exception as e:
             print(str(e) + "NOT VALID NAME")
 
+    def add_trap(self, name):
+        x, y = pygame.mouse.get_pos()
+        name_list = ["stop_trap", "kill_trap", "destroy_trap"]
+        object_list = [StopTrap(x, y), KillTrap(x, y), DestroyTrap(x, y)]
+
+        try:
+            obj = object_list[name_list.index(name)]
+            self.moving_effect = obj
+        except Exception as e:
+            print(str(e))
+
 
 if __name__ == "__main__":
     win = pygame.display.set_mode((1250, 700))
     g = Game(win)
     g.run()
-    # g.run_music()
 

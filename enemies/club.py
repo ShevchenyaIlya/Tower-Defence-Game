@@ -7,6 +7,9 @@ from towers.image_collection import ImageCollection
 imgs = ImageCollection("enemies/", 20, 0, 64, 5, "_enemies_1_run_0")
 imgs.download_images()
 
+attack_imgs = ImageCollection("enemies/", 20, 0, 64, 5, "_enemies_1_attack_0")
+attack_imgs.download_images()
+
 
 class Club(enemy.Enemy):
     def __init__(self):
@@ -14,5 +17,6 @@ class Club(enemy.Enemy):
         self.name = "club"
         self.money = 5
         self.imgs = imgs.images[:]
+        self.attack_imgs = attack_imgs.images[:]
         self.max_health = 5
         self.health = self.max_health
