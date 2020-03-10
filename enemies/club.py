@@ -10,13 +10,18 @@ imgs.download_images()
 attack_imgs = ImageCollection("enemies/", 20, 0, 64, 5, "_enemies_1_attack_0")
 attack_imgs.download_images()
 
+die_imgs = ImageCollection("enemies/", 20, 0, 64, 5, "_enemies_1_die_0")
+die_imgs.download_images()
+
 
 class Club(enemy.Enemy):
     def __init__(self):
         super().__init__()
         self.name = "club"
         self.money = 5
+        self.damage = 1
         self.imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]
+        self.die_imgs = die_imgs.images[:]
         self.max_health = 5
         self.health = self.max_health

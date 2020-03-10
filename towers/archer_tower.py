@@ -99,7 +99,8 @@ class ArcherTowerLong(Tower):
             if self.archer_count == 50:
                 if first_enemy.hit(self.damage):
                     money = first_enemy.money * 2
-                    enemies.remove(first_enemy)
+                    # enemies.remove(first_enemy)
+                    first_enemy.is_die = True
 
             if first_enemy.x < self.x and not self.left:
                 self.left = True

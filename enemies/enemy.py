@@ -26,11 +26,13 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.move_dis = 0
         self.imgs = []
         self.attack_imgs = []
+        self.die_imgs = []
         self.flipped = False
         self.max_health = 0
         self.speed_increase = 1.2
         self.stop_move = False
         self.stop_by_trap = None
+        self.is_die = False
 
     def get_position(self):
         return self.x, self.y
@@ -42,10 +44,12 @@ class Enemy(PositionalObject, ILocation, IMovable):
         :return: None
         """
         if self.stop_by_trap:
-            print("Atack")
             self.img = self.attack_imgs[self.animation_count]
         else:
             self.img = self.imgs[self.animation_count]
+
+        if self.is_die:
+            self.img = self.die_imgs[self.animation_count]
 
         win.blit(self.img, (self.x - self.img.get_width() / 2, self.y - self.img.get_height() / 2 - 35))
         self.draw_health_bar(win)
@@ -57,8 +61,11 @@ class Enemy(PositionalObject, ILocation, IMovable):
         :return: None
         """
         length = 50
-        move_by = length / self.max_health
-        health_bar = round(move_by * self.health)
+        if self.health > 0:
+            move_by = length / self.max_health
+            health_bar = round(move_by * self.health)
+        else:
+            health_bar = 0
 
         pygame.draw.rect(win, (255, 0, 0), (self.x - 30, self.y - 75, length, 10), 0)
         pygame.draw.rect(win, (0, 255, 0), (self.x - 30, self.y - 75, health_bar, 10), 0)
@@ -99,6 +106,8 @@ class Enemy(PositionalObject, ILocation, IMovable):
             self.flipped = True
             for index, img in enumerate(self.imgs):
                 self.imgs[index] = pygame.transform.flip(img, True, False)
+            for index, img in enumerate(self.attack_imgs):
+                self.attack_imgs[index] = pygame.transform.flip(img, True, False)
 
         move_x, move_y = ((self.x + dirn[0]), (self.y + dirn[1]))
 
@@ -132,7 +141,25 @@ class Enemy(PositionalObject, ILocation, IMovable):
             return True
         return False
 
-    def abc(self):
+    def animate_attack(self):
         self.animation_count += 1
-        if self.animation_count >= len(self.imgs):
+        if self.animation_count >= len(self.attack_imgs):
             self.animation_count = 0
+
+    def animate_die(self, enemies):
+        self.animation_count += 1
+        if self.animation_count >= len(self.attack_imgs):
+            self.animation_count = 0
+            enemies.remove(self)
+
+    def attack(self, traps, enemies):
+        if self.animation_count == 19:
+            if self.stop_by_trap.hit(self.damage):
+                if self.stop_by_trap:
+                    traps.remove(self.stop_by_trap)
+                    for enemy in enemies:
+                        if self.stop_by_trap is enemy.stop_by_trap:
+                            enemy.stop_by_trap = None
+                    self.stop_by_trap = None
+
+

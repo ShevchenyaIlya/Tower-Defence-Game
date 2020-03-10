@@ -90,7 +90,7 @@ class Game:
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.__wave = 8
+        self.__wave = 1
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
@@ -310,12 +310,19 @@ class Game:
                 # loop through enemies
                 to_del = []
                 for en in self.enemies:
-                    if not en.stop_by_trap:
-                        en.move()
-                        if en.x < -15:
-                            to_del.append(en)
+                    if not en.is_die:
+                        if not en.stop_by_trap:
+                            en.move()
+                            if en.x < -15:
+                                to_del.append(en)
+                        else:
+                            en.animate_attack()
                     else:
-                        en.abc()
+                        en.animate_die(self.enemies)
+
+                for enemy in self.enemies:
+                    if enemy.stop_by_trap:
+                        enemy.attack(self.traps, self.enemies)
 
                 # delete all enemies off the screen
                 for d in to_del:
@@ -436,6 +443,7 @@ class Game:
         self.stop_trap_btn.draw(self.win)
         text = self.stop_trap_btn.font.render("150", 1, (255, 255, 255))
         self.win.blit(text, (self.stop_trap_btn.x + 35, self.stop_trap_btn.y + self.stop_trap_btn.height // 2 + 25))
+
         # self.kill_trap_btn.draw(self.win)
         self.destroy_trap_btn.draw(self.win)
         text = self.destroy_trap_btn.font.render("200", 1, (255, 255, 255))
