@@ -20,6 +20,7 @@ class Wizard(enemy.Enemy):
         self.name = "wizard"
         self.money = 3
         self.max_health = 3
+        self.damage = 1
         self.health = self.max_health
         self.imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]

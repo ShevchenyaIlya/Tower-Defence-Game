@@ -383,6 +383,7 @@ class Game:
         return True
 
     def draw(self):
+        # draw background
         self.win.blit(self.bg, (0, 0))
 
         """for point in path:
@@ -401,6 +402,7 @@ class Game:
 
             self.moving_object.draw_placement(self.win)
 
+        # redraw moving trap
         if self.moving_effect:
             self.moving_effect.draw_placement(self.win)
 
@@ -410,6 +412,7 @@ class Game:
         for element in object_list:
             element.draw(self.win)
 
+        # loop through traps and draw health bar
         for trap in self.traps:
             if trap.is_attacked:
                 trap.draw_health_bar(self.win)
@@ -500,7 +503,7 @@ class Game:
             obj = object_list[name_list.index(name)]
             self.moving_effect = obj
         except Exception as e:
-            print(str(e))
+            print(str(e) + "NOT VALID NAME")
 
 
 if __name__ == "__main__":

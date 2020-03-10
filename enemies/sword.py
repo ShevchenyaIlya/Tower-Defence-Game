@@ -20,6 +20,7 @@ class Sword(enemy.Enemy):
         self.name = "sword"
         self.money = 50
         self.max_health = 100
+        self.damage = 5
         self.health = self.max_health
         self.imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]

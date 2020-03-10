@@ -35,6 +35,10 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.is_die = False
 
     def get_position(self):
+        """
+        Return actual position of enemy
+        :return: tuple
+        """
         return self.x, self.y
 
     def draw(self, win):
@@ -144,18 +148,34 @@ class Enemy(PositionalObject, ILocation, IMovable):
         return False
 
     def animate_attack(self):
+        """
+        Works if enemy collide with trap
+        Just change animation from run to attack and continue image cycle going
+        :return: None
+        """
         self.animation_count += 1
         self.stop_by_trap.is_attacked = True
         if self.animation_count >= len(self.attack_imgs) * 2:
             self.animation_count = 0
 
     def animate_die(self, enemies):
+        """
+        Continue animate enemy if they die
+        Play animation for last image and remove enemy
+        :param enemies: list
+        :return: None
+        """
         self.animation_count += 1
         if self.animation_count >= len(self.die_imgs) * 2:
             self.animation_count = 0
             enemies.remove(self)
 
     def attack(self, traps):
+        """
+        Attack trap if enemy collide with this trap
+        :param traps: list
+        :return: None
+        """
         if self.stop_by_trap in traps:
             if self.animation_count == 19:
                 if self.stop_by_trap.hit(self.damage):

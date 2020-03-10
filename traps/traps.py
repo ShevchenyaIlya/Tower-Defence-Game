@@ -21,33 +21,62 @@ class Trap:
         self.is_attacked = False
 
     def draw(self, win):
+        """
+        Draw trap depending of it modification
+        :param win: surface
+        :return: None
+        """
         win.blit(self.img, (self.x, self.y))
         if self.is_attacked:
             self.draw_health_bar(win)
 
     def move(self, x, y):
+        """
+        Move trap, by changing coordinates
+        :param x: int
+        :param y: int
+        :return: None
+        """
         self.x = x - self.width / 2
         self.y = y - self.height / 2
 
     def draw_placement(self, win):
+        """
+        Draw circle, that show if you can place trap in current position
+        :param win: surface
+        :return: None
+        """
         surface = pygame.Surface((45 * 2, 45 * 2), pygame.SRCALPHA, 32)
         pygame.draw.circle(surface, self.place_color, (45, 45), 35, 0)
         win.blit(surface, (self.x - self.width // 2 + 35, self.y - self.height // 2 + 35))
 
     def stop_enemy(self, enemies):
+        """
+        Stop enemy animation if they collide with each other
+        :param enemies: list
+        :return: None
+        """
         for enemy in enemies:
             if self.x + self.width // 2 - 28 <= enemy.x <= self.x + self.width // 2 + 35 and self.y + self.height // 2 - 40 <= enemy.y <= self.y + self.height // 2 + 40:
                 enemy.stop_by_trap = self
 
     def hit(self, damage):
-        print(self.health)
-        print("hit")
+        """
+        Make damage for trap, by subtracting enemy damage from trap health
+        :param damage: int
+        :return: boolean
+        """
         self.health -= damage
         if self.health <= 0:
             return True
         return False
 
     def draw_health_bar(self, win):
+        """
+        Draw trap health bar if enemy hit her
+        :param win: surface
+        :return: None
+        """
         length = 50
         if self.health > 0:
             move_by = length / self.max_health
