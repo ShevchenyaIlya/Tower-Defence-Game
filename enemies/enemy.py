@@ -44,12 +44,12 @@ class Enemy(PositionalObject, ILocation, IMovable):
         :return: None
         """
         if self.stop_by_trap:
-            self.img = self.attack_imgs[self.animation_count]
+            self.img = self.attack_imgs[self.animation_count // 2]
         else:
-            self.img = self.imgs[self.animation_count]
+            self.img = self.imgs[self.animation_count // 2]
 
         if self.is_die:
-            self.img = self.die_imgs[self.animation_count]
+            self.img = self.die_imgs[self.animation_count // 2]
 
         win.blit(self.img, (self.x - self.img.get_width() / 2, self.y - self.img.get_height() / 2 - 35))
         self.draw_health_bar(win)
@@ -89,7 +89,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
         :return: None
         """
         self.animation_count += 1
-        if self.animation_count >= len(self.imgs):
+        if self.animation_count >= len(self.imgs) * 2:
             self.animation_count = 0
 
         x1, y1 = self.path[self.path_pos]
@@ -108,6 +108,8 @@ class Enemy(PositionalObject, ILocation, IMovable):
                 self.imgs[index] = pygame.transform.flip(img, True, False)
             for index, img in enumerate(self.attack_imgs):
                 self.attack_imgs[index] = pygame.transform.flip(img, True, False)
+            for index, img in enumerate(self.die_imgs):
+                self.die_imgs[index] = pygame.transform.flip(img, True, False)
 
         move_x, move_y = ((self.x + dirn[0]), (self.y + dirn[1]))
 
@@ -143,23 +145,25 @@ class Enemy(PositionalObject, ILocation, IMovable):
 
     def animate_attack(self):
         self.animation_count += 1
-        if self.animation_count >= len(self.attack_imgs):
+        self.stop_by_trap.is_attacked = True
+        if self.animation_count >= len(self.attack_imgs) * 2:
             self.animation_count = 0
 
     def animate_die(self, enemies):
         self.animation_count += 1
-        if self.animation_count >= len(self.attack_imgs):
+        if self.animation_count >= len(self.die_imgs) * 2:
             self.animation_count = 0
             enemies.remove(self)
 
-    def attack(self, traps, enemies):
-        if self.animation_count == 19:
-            if self.stop_by_trap.hit(self.damage):
-                if self.stop_by_trap:
+    def attack(self, traps):
+        if self.stop_by_trap in traps:
+            if self.animation_count == 19:
+                if self.stop_by_trap.hit(self.damage):
                     traps.remove(self.stop_by_trap)
-                    for enemy in enemies:
-                        if self.stop_by_trap is enemy.stop_by_trap:
-                            enemy.stop_by_trap = None
                     self.stop_by_trap = None
+                    self.animation_count = 0
+        else:
+            self.stop_by_trap = None
+
 
 

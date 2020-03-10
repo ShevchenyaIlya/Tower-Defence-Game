@@ -317,12 +317,12 @@ class Game:
                                 to_del.append(en)
                         else:
                             en.animate_attack()
+                            en.stop_by_trap.is_attacked = True
                     else:
                         en.animate_die(self.enemies)
 
                 for enemy in self.enemies:
-                    if enemy.stop_by_trap:
-                        enemy.attack(self.traps, self.enemies)
+                    enemy.attack(self.traps)
 
                 # delete all enemies off the screen
                 for d in to_del:
@@ -330,9 +330,9 @@ class Game:
                     self.enemies.remove(d)
 
                 # if you lose
-                    if self.__lives <= 0:
-                        print("You lose")
-                        run = False
+                if self.__lives <= 0:
+                    print("You lose")
+                    run = False
 
                 # loop through attack towers
                 for tw in self.attack_towers:
@@ -409,6 +409,10 @@ class Game:
         object_list.sort(key=lambda x: x.y, reverse=False)
         for element in object_list:
             element.draw(self.win)
+
+        for trap in self.traps:
+            if trap.is_attacked:
+                trap.draw_health_bar(self.win)
         """# draw attack towers
         for tw in self.attack_towers:
             tw.draw(self.win)

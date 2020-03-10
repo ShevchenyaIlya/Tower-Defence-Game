@@ -26,12 +26,6 @@ class Trap:
             self.draw_health_bar(win)
 
     def move(self, x, y):
-        """
-        Moves tower to given x and y position
-        :param x: int
-        :param y: int
-        :return: None
-        """
         self.x = x - self.width / 2
         self.y = y - self.height / 2
 
@@ -42,7 +36,7 @@ class Trap:
 
     def stop_enemy(self, enemies):
         for enemy in enemies:
-            if self.x + self.width // 2 - 28 <= enemy.x <= self.x + self.width // 2 + 35 and self.y + self.height // 2 - 30 <= enemy.y <= self.y + self.height // 2 + 30:
+            if self.x + self.width // 2 - 28 <= enemy.x <= self.x + self.width // 2 + 35 and self.y + self.height // 2 - 40 <= enemy.y <= self.y + self.height // 2 + 40:
                 enemy.stop_by_trap = self
 
     def hit(self, damage):
@@ -70,7 +64,7 @@ class StopTrap(Trap):
         super().__init__(x, y, trap1)
         self.name = "stop_trap"
         self.cost = 150
-        self.max_health = 10
+        self.max_health = 75
         self.health = self.max_health
 
 
@@ -78,6 +72,8 @@ class KillTrap(Trap):
     def __init__(self, x, y):
         super().__init__(x, y, trap)
         self.name = "kill_trap"
+        self.max_health = 35
+        self.health = self.max_health
 
 
 class DestroyTrap(Trap):
