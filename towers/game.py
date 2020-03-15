@@ -90,7 +90,7 @@ class Game:
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.__wave = 3
+        self.__wave = 0
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
@@ -142,7 +142,10 @@ class Game:
                 # generate monsters
                 if time.time() - self.__timer >= random.randrange(1, 5) / 3:  # change speed of spanning enemies
                     self.__timer = time.time()
-                    self.generate_enemies()
+                    try:
+                        self.generate_enemies()
+                    except IndexError:
+                        return True
 
             pos = pygame.mouse.get_pos()
 
@@ -347,6 +350,8 @@ class Game:
                     tw.support(self.attack_towers)
 
             self.draw()
+        if self.__lives <= 0:
+            return False
         pygame.quit()
 
     @staticmethod

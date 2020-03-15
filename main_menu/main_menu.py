@@ -34,11 +34,32 @@ class MainMenu:
                     if self.__btn[0] <= x <= self.__btn[0] + self.__btn[2]:
                         if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
                             game = Game(self.__win)
-                            game.run()
-                            del game
-                            game_quit = True
-                            run = False
-                            break
+                            res = game.run()
+                            if res is None:
+                                del game
+                                game_quit = True
+                                run = False
+                                break
+                            elif res:
+                                del game
+                                win_or_lose = WinOrLose()
+                                win_or_lose.win = True
+                                game_quit = True
+                                if win_or_lose.run():
+                                    run = True
+                                else:
+                                    run = False
+                                    break
+                            elif not res:
+                                del game
+                                win_or_lose = WinOrLose()
+                                win_or_lose.win = False
+                                game_quit = True
+                                if win_or_lose.run():
+                                    run = True
+                                else:
+                                    run = False
+                                    break
             if not game_quit:
                 self.draw()
 
@@ -46,6 +67,54 @@ class MainMenu:
         self.__win.blit(self.bg, (0, 0))
         self.__win.blit(start_btn, (self.__btn[0], self.__btn[1]))
         self.__win.blit(logo, (self.__width / 2 - logo.get_width() / 2, 5))
+        pygame.display.update()
+
+
+win_logo = ControlImageCollection("../game_assets/you_win.png", 1000, 250).download_image()
+lose_logo = ControlImageCollection("../game_assets/you_lose.png", 1000, 250).download_image()
+
+
+class WinOrLose:
+    def __init__(self):
+        self.__width = 1250
+        self.__height = 700
+        self.__win = pygame.display.set_mode((self.__width, self.__height))
+        self.bg = pygame.image.load(os.path.join("../game_assets/hole_backgrounds.png"))
+        self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+        self.__btn = (self.__width / 2 - start_btn.get_width() / 2, 350, start_btn.get_width(), start_btn.get_height())
+        self.__text_font = pygame.font.SysFont("life count", 120)
+        self.win_logo = win_logo
+        self.lose_logo = lose_logo
+        self.win = False
+
+    def run(self):
+        run = True
+
+        while run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+
+                if event.type == pygame.MOUSEBUTTONUP:
+                    # check if hit start btn
+                    x, y = pygame.mouse.get_pos()
+
+                    if self.__btn[0] <= x <= self.__btn[0] + self.__btn[2]:
+                        if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
+                            return True
+
+            self.draw()
+
+    def draw(self):
+        self.__win.blit(self.bg, (0, 0))
+        if self.win:
+            self.__win.blit(self.win_logo, (self.__width / 2 - logo.get_width() / 2, 5))
+        else:
+            self.__win.blit(self.lose_logo, (self.__width / 2 - logo.get_width() / 2, 5))
+
+        text = self.__text_font.render("Play again?", 1, (0, 0, 0))
+        self.__win.blit(text, (self.__width / 2 - text.get_width() // 2, 250))
+        self.__win.blit(start_btn, (self.__btn[0], self.__btn[1]))
         pygame.display.update()
 
 
