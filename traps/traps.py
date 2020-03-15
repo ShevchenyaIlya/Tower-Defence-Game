@@ -1,5 +1,5 @@
 import pygame
-from towers.image_collection import ControlImageCollection
+from towers.image_collection import ControlImageCollection, ImageCollection
 
 trap = ControlImageCollection("../game_assets/traps_icon_3.png", 60, 55).download_image()
 trap1 = ControlImageCollection("../game_assets/traps_1.png", 80, 80).download_image()
@@ -11,7 +11,9 @@ class Trap:
         self.x = x - img.get_width() / 2
         self.y = y - img.get_height() / 2
         self.img = img
+        self.animation = []
         self.health = 0
+        self.damage = 0
         self.max_health = 10
         self.cost = 0
         self.name = None
@@ -19,6 +21,8 @@ class Trap:
         self.height = self.img.get_height()
         self.place_color = (0, 255, 0, 100)
         self.is_attacked = False
+        self.is_destroyed = False
+        self.animation_count = 0
 
     def draw(self, win):
         """
@@ -26,9 +30,13 @@ class Trap:
         :param win: surface
         :return: None
         """
-        win.blit(self.img, (self.x, self.y))
-        if self.is_attacked:
-            self.draw_health_bar(win)
+        if self.is_destroyed:
+            self.img = self.animation[self.animation_count // 2]
+            win.blit(self.img, (self.x, self.y))
+        else:
+            win.blit(self.img, (self.x, self.y))
+            if self.is_attacked:
+                self.draw_health_bar(win)
 
     def move(self, x, y):
         """
@@ -87,6 +95,16 @@ class Trap:
         pygame.draw.rect(win, (255, 0, 0), (self.x + 15, self.y + self.height - 15, length, 10), 0)
         pygame.draw.rect(win, (0, 255, 0), (self.x + 15, self.y + self.height - 15, health_bar, 10), 0)
 
+    def destroy(self, traps, enemies):
+        self.animation_count += 1
+        if self.animation_count >= len(self.animation) * 2:
+            self.animation_count = 0
+            for enemy in enemies:
+                if self.x + self.width // 2 - 28 <= enemy.x <= self.x + self.width // 2 + 35 and self.y + self.height // 2 - 40 <= enemy.y <= self.y + self.height // 2 + 40:
+                    if enemy.hit(self.damage):
+                        enemy.is_die = True
+            traps.remove(self)
+
 
 class StopTrap(Trap):
     def __init__(self, x, y):
@@ -105,8 +123,17 @@ class KillTrap(Trap):
         self.health = self.max_health
 
 
+destroy = []
+for i in range(1, 9):
+    destroy.append(pygame.transform.scale(pygame.image.load("../game_assets/trap_animations/1/1_trap_1_die_" + str(i) + ".png"), (100, 100)))
+
+
 class DestroyTrap(Trap):
     def __init__(self, x, y):
         super().__init__(x, y, trap2)
         self.name = "destroy_trap"
         self.cost = 200
+        self.damage = 10
+        self.max_health = 35
+        self.health = self.max_health
+        self.animation = destroy[:]

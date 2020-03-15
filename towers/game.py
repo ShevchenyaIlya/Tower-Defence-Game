@@ -90,7 +90,7 @@ class Game:
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.__wave = 1
+        self.__wave = 3
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
@@ -307,6 +307,10 @@ class Game:
                 for trap in self.traps:
                     trap.stop_enemy(self.enemies)
 
+                for trap in self.traps:
+                    if trap.is_destroyed:
+                        trap.destroy(self.traps, self.enemies)
+
                 # loop through enemies
                 to_del = []
                 for en in self.enemies:
@@ -416,6 +420,10 @@ class Game:
         for trap in self.traps:
             if trap.is_attacked:
                 trap.draw_health_bar(self.win)
+        # loop through enemies and draw health bar
+        for enemy in self.enemies:
+            enemy.draw_health_bar(self.win)
+
         """# draw attack towers
         for tw in self.attack_towers:
             tw.draw(self.win)

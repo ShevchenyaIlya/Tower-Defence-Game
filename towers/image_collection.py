@@ -43,13 +43,30 @@ class ImageCollection(Container):
         return item in self.images
 
     def __iter__(self):
-        return iter(self.images)
+        return ImageIterator(self.images)
 
     def __len__(self):
         return self.number_of_imgs()
 
     def __del__(self):
         del self.images
+
+
+class ImageIterator:
+    def __init__(self, images):
+        self.images = images
+        self.index = 0
+
+    def __next__(self):
+        try:
+            images = self.images[self.index]
+        except IndexError:
+            raise StopIteration()
+        self.index += 1
+        return images
+
+    def __iter__(self):
+        return self
 
 
 class ControlImageCollection:

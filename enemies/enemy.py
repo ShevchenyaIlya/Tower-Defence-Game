@@ -56,7 +56,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
             self.img = self.die_imgs[self.animation_count // 2]
 
         win.blit(self.img, (self.x - self.img.get_width() / 2, self.y - self.img.get_height() / 2 - 35))
-        self.draw_health_bar(win)
+        # self.draw_health_bar(win)
 
     def draw_health_bar(self, win):
         """
@@ -179,7 +179,10 @@ class Enemy(PositionalObject, ILocation, IMovable):
         if self.stop_by_trap in traps:
             if self.animation_count == 19:
                 if self.stop_by_trap.hit(self.damage):
-                    traps.remove(self.stop_by_trap)
+                    if self.stop_by_trap.name == "destroy_trap":
+                        self.stop_by_trap.is_destroyed = True
+                    else:
+                        traps.remove(self.stop_by_trap)
                     self.stop_by_trap = None
                     self.animation_count = 0
         else:
