@@ -22,6 +22,8 @@ class Troll(enemy.Enemy):
         self.imgs = imgs.images[:]
         self.max_health = 3
         self.damage = 1
+        self.armor = 2
+        self.magick_resist = 1
         self.health = self.max_health
         self.attack_imgs = attack_imgs.images[:]
         self.die_imgs = die_imgs.images[:]

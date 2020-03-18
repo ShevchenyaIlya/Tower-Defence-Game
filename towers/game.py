@@ -81,7 +81,7 @@ class Game:
         self.support_towers = []
         self.traps = []
         self.__lives = 10
-        self.__money = 100000
+        self.__money = 20000
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__timer = time.time()
@@ -90,7 +90,7 @@ class Game:
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.__wave = 0
+        self.__wave = 6
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
@@ -98,7 +98,6 @@ class Game:
         self.sound_button = PlayPauseButton(sound_btn.convert_alpha(), sound_btn_off.convert_alpha(), 90, self.__height - 85)
 
         self.stop_trap_btn = PlayPauseButton(stop_trap_img.convert_alpha(), stop_trap_img.convert_alpha(), 1000, self.__height - 90)
-        # self.kill_trap_btn = PlayPauseButton(kill_trap_img.convert_alpha(), kill_trap_img.convert_alpha(), 915, self.__height - 90)
         self.destroy_trap_btn = PlayPauseButton(destroying_trap_img.convert_alpha(), destroying_trap_img.convert_alpha(), 915, self.__height - 90)
 
         self.menu = VerticalMenu(self.__width - side_img.get_width() + 80, 190, side_img)
@@ -251,10 +250,13 @@ class Game:
                             self.moving_object = None
 
                     else:
+
                         if self.stop_trap_btn.click(pos[0], pos[1]):
-                            self.add_trap("stop_trap")
+                            if self.__money >= 150:
+                                self.add_trap("stop_trap")
                         elif self.destroy_trap_btn.click(pos[0], pos[1]):
-                            self.add_trap("destroy_trap")
+                            if self.__money >= 200:
+                                self.add_trap("destroy_trap")
 
                         # check for play or pause
                         if self.play_pause_button.click(pos[0], pos[1]):
@@ -398,10 +400,6 @@ class Game:
         """for point in path:
             pygame.draw.circle(self.win, (255, 0, 0), point, 3)"""
 
-        # draw trap
-        """for trap in self.traps:
-            trap.draw(self.win)"""
-
         # draw placement rings
         if self.moving_object:
             for tower in self.attack_towers:
@@ -410,6 +408,10 @@ class Game:
                 tower.draw_placement(self.win)
 
             self.moving_object.draw_placement(self.win)
+
+        # redraw selected tower
+        if self.selected_tower:
+            self.selected_tower.draw(self.win)
 
         # redraw moving trap
         if self.moving_effect:
@@ -421,13 +423,14 @@ class Game:
         for element in object_list:
             element.draw(self.win)
 
-        # loop through traps and draw health bar
+        """# loop through traps and draw health bar
         for trap in self.traps:
             if trap.is_attacked:
                 trap.draw_health_bar(self.win)
+                
         # loop through enemies and draw health bar
         for enemy in self.enemies:
-            enemy.draw_health_bar(self.win)
+            enemy.draw_health_bar(self.win)"""
 
         """# draw attack towers
         for tw in self.attack_towers:
@@ -444,16 +447,14 @@ class Game:
         # draw vertical menu
         self.menu.draw(self.win)
 
-        # redraw selected tower
-        if self.selected_tower:
-            self.selected_tower.draw(self.win)
-
         # draw moving object
         if self.moving_object:
+            self.moving_object.draw_placement(self.win)
             self.moving_object.draw(self.win)
 
         # draw moving effect
         if self.moving_effect:
+            self.moving_effect.draw_placement(self.win)
             self.moving_effect.draw(self.win)
 
         # draw play/pause button

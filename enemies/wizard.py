@@ -21,6 +21,8 @@ class Wizard(enemy.Enemy):
         self.money = 3
         self.max_health = 3
         self.damage = 1
+        self.armor = 0
+        self.magick_resist = 4
         self.health = self.max_health
         self.imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]

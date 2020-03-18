@@ -29,7 +29,7 @@ class ArcherTowerLong(Tower):
 
         self.in_range = False
         self.left = False
-        self.damage = 1
+        self.damage = 2
         self.original_damage = self.damage
         self.width = self.height = 90
         self.moving = False
@@ -133,7 +133,7 @@ class ArcherTowerShort(ArcherTowerLong):
         self.original_range = self.range
         self.in_range = False
         self.left = False
-        self.damage = 2
+        self.damage = 4
         self.original_damage = self.damage
         self.width = self.height = 100
         self.name = "archer_short"

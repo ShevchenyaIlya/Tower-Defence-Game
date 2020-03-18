@@ -8,8 +8,8 @@ trap2 = ControlImageCollection("../game_assets/traps_2.png", 80, 80).download_im
 
 class Trap:
     def __init__(self, x, y, img):
-        self.x = x - img.get_width() / 2
-        self.y = y - img.get_height() / 2
+        self.x = x + img.get_width() / 2
+        self.y = y + img.get_height() / 2
         self.img = img
         self.animation = []
         self.health = 0

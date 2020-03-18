@@ -11,6 +11,8 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.height = 64
         self.animation_count = 0
         self.health = 1
+        self.armor = 0
+        self.magick_resist = 0
         self.damage = 0
         self.vel = 3
         self.path = [(-10, 225), (14, 224), (165, 225), (216, 252), (269, 282), (555, 284), (619, 248), (639, 179),
@@ -56,7 +58,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
             self.img = self.die_imgs[self.animation_count // 2]
 
         win.blit(self.img, (self.x - self.img.get_width() / 2, self.y - self.img.get_height() / 2 - 35))
-        # self.draw_health_bar(win)
+        self.draw_health_bar(win)
 
     def draw_health_bar(self, win):
         """
@@ -142,7 +144,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
         each call
         :return: Bool
         """
-        self.health -= damage
+        self.health -= damage - (self.armor / 4 + self.magick_resist / 4)
         if self.health <= 0:
             return True
         return False

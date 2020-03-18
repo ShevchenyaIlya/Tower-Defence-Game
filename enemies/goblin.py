@@ -21,6 +21,8 @@ class Goblin(enemy.Enemy):
         self.money = 35
         self.max_health = 25
         self.damage = 3
+        self.armor = 1
+        self.magick_resist = 2
         self.health = self.max_health
         self.imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]
