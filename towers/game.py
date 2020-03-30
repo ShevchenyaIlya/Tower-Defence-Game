@@ -81,7 +81,7 @@ class Game:
         self.support_towers = []
         self.traps = []
         self.__lives = 10
-        self.__money = 20000
+        self.__money = 2000
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__timer = time.time()
@@ -90,7 +90,7 @@ class Game:
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.__wave = 6
+        self.__wave = 3
         self.__current_wave = waves[self.__wave][:]
         self.pause = True
         self.music_on = True
