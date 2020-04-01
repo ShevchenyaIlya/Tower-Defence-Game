@@ -2,6 +2,8 @@ import pygame
 import os
 import sqlite3
 import string
+import time
+import datetime
 from towers.game import Game
 from towers.image_collection import ControlImageCollection
 
@@ -9,10 +11,25 @@ from towers.image_collection import ControlImageCollection
 conn = sqlite3.connect("tower_defence_database.db")
 cursor = conn.cursor()
 
-cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='users' ''')
+cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='information' ''')
 
+top_five = []
 if cursor.fetchone()[0] == 0:
-    cursor.execute("""CREATE TABLE users (username text, score text)""")
+    cursor.execute("""CREATE TABLE information (username text, wave text, enemy_kill text, last_entrance text,
+                      lives text, money text, result text, spend_time text)""")
+
+cursor.execute("SELECT * FROM information")
+db_rows = cursor.fetchall()
+db_rows.sort(key=lambda x: x[1], reverse=True)
+
+if len(db_rows) < 6:
+    iter_number = len(db_rows)
+else:
+    iter_number = 6
+
+for row in range(iter_number):
+    top_five.append((db_rows[row][0], db_rows[row][1], db_rows[row][2]))
+
 
 start_btn = ControlImageCollection("../game_assets/start_menu_button.png", 250, 350).download_image()
 logo = ControlImageCollection("../game_assets/game_logo_1.png", 1000, 250).download_image()
@@ -32,7 +49,9 @@ class MainMenu:
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__btn = (self.__width / 2 - start_btn.get_width() / 2, 350, start_btn.get_width(), start_btn.get_height())
         self.__text_font = pygame.font.SysFont("username", 50)
+        self.__score_font = pygame.font.SysFont("monospace", 20, 1)
         self.__username = ""
+        self.__superuser_name = "TDgamecreator"
         self.start_input = False
 
     def run(self):
@@ -55,10 +74,8 @@ class MainMenu:
                             self.__username = self.__username[:-1]
 
                         if pressed_keys in string.ascii_letters or pressed_keys in string.digits:
-                            if len(self.__username) <= 15:
+                            if len(self.__username) <= 13:
                                 self.__username += pressed_keys
-
-                        print(self.__username)
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     # check if hit start btn
@@ -73,35 +90,71 @@ class MainMenu:
                     else:
                         self.start_input = False
 
-                    if self.__btn[0] <= x <= self.__btn[0] + self.__btn[2]:
-                        if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
-                            game = Game(self.__win)
-                            res = game.run()
-                            if res is None:
-                                del game
-                                game_quit = True
-                                run = False
-                                break
-                            elif res:
-                                del game
-                                win_or_lose = WinOrLose()
-                                win_or_lose.win = True
-                                game_quit = True
-                                if win_or_lose.run():
-                                    run = True
+                    if self.__username:
+                        if self.__btn[0] <= x <= self.__btn[0] + self.__btn[2]:
+                            if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
+                                game = Game(self.__win)
+
+                                before_interruption = 0
+                                for index, row in enumerate(db_rows):
+                                    if self.__username == row[0] and row[6] == "interrupted":
+                                        game.money = int(row[5])
+                                        game.wave = int(row[1])
+                                        game.lives = int(row[4])
+                                        game.enemy_kill = int(row[2])
+                                        before_interruption = float(row[7])
+
+                                        cursor.execute("DELETE FROM information WHERE username=? AND result=? AND wave=? AND money=? AND lives=? AND enemy_kill = ?;", (self.__username, "interrupted", row[1], row[5], row[4], row[2]))
+                                        conn.commit()
+                                        break
+
+                                if self.__username == self.__superuser_name:
+                                    game.money = 100000000000
+                                    game.lives = 100000000000
+
+                                start_timer = time.time()
+                                res = game.run()
+                                spend_time = time.time() - start_timer + before_interruption
+
+                                if res is None:
+                                    game_result = "interrupted"
+                                elif res:
+                                    game_result = "win"
                                 else:
+                                    game_result = "lose"
+
+                                if self.__username != self.__superuser_name:
+                                    write_data = [self.__username, game.wave, game.enemy_kill,
+                                                  datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), game.lives,
+                                                  game.money, game_result, spend_time]
+                                    cursor.execute("""INSERT INTO information VALUES (?, ?, ?, ?, ?, ?, ?, ?);""", write_data)
+                                    conn.commit()
+
+                                if res is None:
+                                    del game
+                                    game_quit = True
                                     run = False
                                     break
-                            elif not res:
-                                del game
-                                win_or_lose = WinOrLose()
-                                win_or_lose.win = False
-                                game_quit = True
-                                if win_or_lose.run():
-                                    run = True
-                                else:
-                                    run = False
-                                    break
+                                elif res:
+                                    del game
+                                    win_or_lose = WinOrLose()
+                                    win_or_lose.win = True
+                                    game_quit = True
+                                    if win_or_lose.run():
+                                        run = True
+                                    else:
+                                        run = False
+                                        break
+                                elif not res:
+                                    del game
+                                    win_or_lose = WinOrLose()
+                                    win_or_lose.win = False
+                                    game_quit = True
+                                    if win_or_lose.run():
+                                        run = True
+                                    else:
+                                        run = False
+                                        break
             if not game_quit:
                 self.draw()
 
@@ -125,7 +178,19 @@ class MainMenu:
         score_table = self.__text_font.render("Score", 1, (0, 0, 0))
         self.__win.blit(text_background, (50, self.__height / 2 - 50))
         self.__win.blit(score_table, (225, self.__height / 2 - 25))
+
+        self.draw_scores()
         pygame.display.update()
+
+    def draw_scores(self):
+
+        best_score = self.__score_font.render(("Nickname:" + "      " + "Wave:" + "   " + "Enemy kill:"), 1, (0, 0, 0))
+        self.__win.blit(best_score, (65, self.__height / 2 + 30))
+
+        for row in range(iter_number):
+            space_number = (17 - len(top_five[row][0]), 10 - len(top_five[row][1]))
+            best_score = self.__score_font.render((top_five[row][0] + " " * space_number[0] + top_five[row][1] + " " * space_number[1] + top_five[row][2]), 1, (0, 0, 0))
+            self.__win.blit(best_score, (65, self.__height / 2 + 30 + 30 * (row + 1)))
 
 
 win_logo = ControlImageCollection("../game_assets/you_win.png", 1000, 250).download_image()
@@ -174,12 +239,10 @@ class WinOrLose:
         self.__win.blit(text, (self.__width / 2 - text.get_width() // 2, 250))
         self.__win.blit(start_btn, (self.__btn[0], self.__btn[1]))
 
-        self.__win.blit(panel, (50, self.__height / 2 - 50))
+        """self.__win.blit(panel, (50, self.__height / 2 - 50))
         score_table = label_font.render("Score", 1, (0, 0, 0))
         self.__win.blit(text_background, (50, self.__height / 2 - 50))
-        self.__win.blit(score_table, (225, self.__height / 2 - 25))
-        pygame.display.update()
-
+        self.__win.blit(score_table, (225, self.__height / 2 - 25))"""
         pygame.display.update()
 
 

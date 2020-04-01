@@ -171,6 +171,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
         if self.animation_count >= len(self.die_imgs) * 2:
             self.animation_count = 0
             enemies.remove(self)
+            return True
 
     def attack(self, traps):
         """

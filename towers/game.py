@@ -25,9 +25,10 @@ path = [(-10, 225), (14, 224), (90, 225), (165, 225), (216, 252), (269, 282), (3
         (412, 556), (288, 554), (163, 548), (98, 484), (81, 393), (18, 339), (-30, 335)]
 
 
-lives_img = ControlImageCollection("../game_assets/heart2.png", 56, 56).download_image()
+lives_img = ControlImageCollection("../game_assets/heart2.png", 36, 36).download_image()
 star_img = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
 side_img = pygame.transform.rotate(ControlImageCollection("../game_assets/vertical_menu_1.png", 600, 125).download_image(), -90)
+enemy_head = ControlImageCollection("../game_assets/head.png", 24, 24).download_image()
 
 play_btn = ControlImageCollection("../game_assets/play_button_1.png", 75, 75).download_image()
 pause_btn = ControlImageCollection("../game_assets/pause_button.png", 75, 75).download_image()
@@ -70,6 +71,8 @@ waves = [
     [50, 50, 50, 100, 5],
 ]
 
+bonus_wave = [5, 5, 5, 5, 5, 5]
+
 
 class Game:
     def __init__(self, win):
@@ -82,16 +85,17 @@ class Game:
         self.traps = []
         self.__lives = 10
         self.__money = 2000
+        self.__enemy_kill = 0
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__timer = time.time()
-        self.life_font = pygame.font.SysFont("life count", 45)
+        self.life_font = pygame.font.SysFont("life count", 30)
         self.selected_tower = None
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.__wave = 3
-        self.__current_wave = waves[self.__wave][:]
+        self.wave = 9
+        self.__current_wave = waves[self.wave][:]
         self.pause = True
         self.music_on = True
         self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(), pause_btn.convert_alpha(), 10, self.__height - 85)
@@ -110,6 +114,30 @@ class Game:
         self.__key_phrase = [109, 111, 110, 101, 121]  # money
         self.input_key_phrase = []
 
+    @property
+    def enemy_kill(self):
+        return self.__enemy_kill
+
+    @enemy_kill.setter
+    def enemy_kill(self, value):
+        self.__enemy_kill = value
+
+    @property
+    def lives(self):
+        return self.__lives
+
+    @lives.setter
+    def lives(self, value):
+        self.__lives = value
+
+    @property
+    def money(self):
+        return self.__money
+
+    @money.setter
+    def money(self, value):
+        self.__money = value
+
     def generate_enemies(self):
         """
         Generate the next enemy or enemies
@@ -117,12 +145,16 @@ class Game:
         """
         if sum(self.__current_wave) == 0:
             if len(self.enemies) == 0:
-                self.__wave += 1
-                self.__current_wave = waves[self.__wave]
+                self.wave += 1
+                if self.wave == 10 and self.__money > 2000 and self.__enemy_kill > 100:
+                    self.__current_wave = bonus_wave
+                else:
+                    self.__current_wave = waves[self.wave]
                 self.pause = True
                 self.play_pause_button.pause = self.pause
         else:
             wave_enemies = [Scorpion(), Wizard(), Club(), Troll(), Sword(), Goblin()]
+
             for x in range(len(self.__current_wave)):
                 if self.__current_wave[x] != 0:
                     self.enemies.append(wave_enemies[x])
@@ -328,7 +360,8 @@ class Game:
                             en.animate_attack()
                             en.stop_by_trap.is_attacked = True
                     else:
-                        en.animate_die(self.enemies)
+                        if en.animate_die(self.enemies):
+                            self.__enemy_kill += 1
 
                 for enemy in self.enemies:
                     enemy.attack(self.traps)
@@ -336,6 +369,7 @@ class Game:
                 # delete all enemies off the screen
                 for d in to_del:
                     self.__lives -= 1
+
                     self.enemies.remove(d)
 
                 # if you lose
@@ -478,21 +512,27 @@ class Game:
         life = lives_img
         start_x = self.__width - life.get_width() - 10
 
-        self.win.blit(text, (start_x - text.get_width(), 25))
-        self.win.blit(life, (start_x, 10))
+        self.win.blit(text, (start_x - text.get_width(), 20))
+        self.win.blit(life, (start_x, 8))
 
         # draw currency
         text = self.life_font.render(str(self.__money), 1, (255, 255, 255))
-        money = pygame.transform.scale(star_img, (50, 50))
         start_x = self.__width - life.get_width() - 10
 
-        self.win.blit(text, (start_x - text.get_width(), 80))
-        self.win.blit(money, (start_x + 5, 65))
+        self.win.blit(text, (start_x - text.get_width(), 55))
+        self.win.blit(star_img, (start_x, 40))
+
+        # draw kills
+        number_of_kills = self.life_font.render(str(self.__enemy_kill), 1, (255, 255, 255))
+        start_x = self.__width - life.get_width() - 10
+
+        self.win.blit(number_of_kills, (start_x - number_of_kills.get_width(), 85))
+        self.win.blit(enemy_head, (start_x + 8, 80))
 
         # draw wave
         self.win.blit(wave_bg, (10, 10))
-        text = self.life_font.render("Wave #" + str(self.__wave), 1, (255, 255, 255))
-        self.win.blit(text, (10 + wave_bg.get_width() / 2 - text.get_width() / 2, 35))
+        text = self.life_font.render("Wave #" + str(self.wave), 1, (255, 255, 255))
+        self.win.blit(text, (10 + wave_bg.get_width() / 2 - text.get_width() / 2, 40))
 
         pygame.display.update()
 
