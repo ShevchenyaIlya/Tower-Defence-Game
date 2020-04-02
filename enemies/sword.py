@@ -1,6 +1,5 @@
-import datetime
 from enemies import enemy
-from towers.image_collection import ImageCollection
+from game.image_collection import ImageCollection
 
 
 imgs = ImageCollection("enemies/", 20, 0, 100, 8, "_enemies_1_run_0")

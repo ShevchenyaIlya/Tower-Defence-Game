@@ -1,5 +1,5 @@
 import pygame
-from towers.image_collection import ControlImageCollection, ImageCollection
+from game.image_collection import ControlImageCollection
 
 trap = ControlImageCollection("../game_assets/traps_icon_3.png", 60, 55).download_image()
 trap1 = ControlImageCollection("../game_assets/traps_1.png", 80, 80).download_image()

@@ -1,7 +1,7 @@
 import pygame
 import math
-from towers.positional_object import PositionalObject
-from towers.interfaces import ILocation, IMovable
+from game.positional_object import PositionalObject
+from game.interfaces import ILocation, IMovable
 
 
 class Enemy(PositionalObject, ILocation, IMovable):

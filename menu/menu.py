@@ -1,7 +1,7 @@
 import pygame
-from towers.control_object import ButtonObject, MenuObject
-from towers.interfaces import ILocation
-from towers.image_collection import ControlImageCollection
+from game.control_object import ButtonObject, MenuObject
+from game.interfaces import ILocation
+from game.image_collection import ControlImageCollection
 
 
 big_star = ControlImageCollection("../game_assets/star1.png", 50, 50).download_image()

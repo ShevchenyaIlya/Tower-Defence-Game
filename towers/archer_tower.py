@@ -1,9 +1,8 @@
 import pygame
 from towers.tower import Tower
-import os
 import math
 from menu.menu import Menu
-from towers.image_collection import ImageCollection, ControlImageCollection
+from game.image_collection import ImageCollection, ControlImageCollection
 
 menu_bg = ControlImageCollection("../game_assets/menu1.png", 150, 75).download_image()
 upgrade_btn = ControlImageCollection("../game_assets/upgrade.png", 50, 50).download_image()

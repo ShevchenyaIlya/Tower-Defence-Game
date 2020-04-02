@@ -1,8 +1,6 @@
-import pygame
 from towers.tower import Tower
-import os
 import math
-from towers.image_collection import ImageCollection
+from game.image_collection import ImageCollection
 
 
 range_imgs = ImageCollection("../game_assets/towers/support tower/1/", 3, 1, 90, 0, "support_tower_1_")

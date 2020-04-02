@@ -1,5 +1,6 @@
 import pygame
 import os
+import string
 from enemies.scorpion import Scorpion
 from enemies.club import Club
 from enemies.wizard import Wizard
@@ -10,7 +11,9 @@ from towers.archer_tower import ArcherTowerLong, ArcherTowerShort
 from towers.support_tower import RangeTower, DamageTower
 from traps.traps import KillTrap, StopTrap, DestroyTrap
 from menu.menu import VerticalMenu, PlayPauseButton
-from towers.image_collection import ControlImageCollection, ImageCollection
+from game.image_collection import ControlImageCollection, ImageCollection
+from game.level_settings import waves, bonus_wave, challenge_waves
+from game.singleton import Singleton
 import time
 import random
 import math
@@ -29,6 +32,7 @@ lives_img = ControlImageCollection("../game_assets/heart2.png", 36, 36).download
 star_img = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
 side_img = pygame.transform.rotate(ControlImageCollection("../game_assets/vertical_menu_1.png", 600, 125).download_image(), -90)
 enemy_head = ControlImageCollection("../game_assets/head.png", 24, 24).download_image()
+chit_code_table = ControlImageCollection("../game_assets/vertical_menu_1.png", 300, 60).download_image()
 
 play_btn = ControlImageCollection("../game_assets/play_button_1.png", 75, 75).download_image()
 pause_btn = ControlImageCollection("../game_assets/pause_button.png", 75, 75).download_image()
@@ -51,29 +55,8 @@ support_tower_names = ["range", "damage"]
 # load music
 pygame.mixer.music.load(os.path.join("../game_assets", "bensound-funnysong.wav"))
 
-# waves in form of frequency of enemies (scorpions, wizards, clubs, trolls, swords)
-waves = [
-    [20, 0, 0, 0, 0],
-    [50, 0, 0, 0, 0],
-    [100, 0, 0, 0, 0],
-    [0, 20, 0, 0, 0, 1],
-    [0, 50, 0, 0, 1],
-    [0, 100, 0, 0, 0],
-    [0, 0, 20, 0, 0],
-    [0, 0, 50, 0, 0],
-    [0, 0, 100, 0, 0],
-    [20, 100, 0, 0, 0],
-    [50, 100, 0, 0, 0],
-    [100, 100, 0, 0, 0],
-    [0, 0, 0, 50, 2],
-    [0, 0, 0, 100, 1],
-    [20, 0, 0, 150, 1],
-    [50, 50, 50, 100, 5],
-]
 
-bonus_wave = [5, 5, 5, 5, 5, 5]
-
-
+@Singleton
 class Game:
     def __init__(self, win):
         self.__width = 1250
@@ -84,8 +67,8 @@ class Game:
         self.support_towers = []
         self.traps = []
         self.__lives = 10
-        self.__money = 2000
-        self.__enemy_kill = 0
+        self.__money = 10000
+        self.__enemy_kill = 1000
         self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__timer = time.time()
@@ -94,7 +77,7 @@ class Game:
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.wave = 9
+        self.wave = 4
         self.__current_wave = waves[self.wave][:]
         self.pause = True
         self.music_on = True
@@ -110,9 +93,8 @@ class Game:
         self.menu.add_btn(tower_icon_img.images[2].convert_alpha(), "buy_damage", 1000)
         self.menu.add_btn(tower_icon_img.images[1].convert_alpha(), "buy_range", 1000)
 
-        self.key_phrase_input = False
-        self.__key_phrase = [109, 111, 110, 101, 121]  # money
-        self.input_key_phrase = []
+        self.is_input_chit = False
+        self.current_chit_code = ""
 
     @property
     def enemy_kill(self):
@@ -145,10 +127,12 @@ class Game:
         """
         if sum(self.__current_wave) == 0:
             if len(self.enemies) == 0:
-                self.wave += 1
                 if self.wave == 10 and self.__money > 2000 and self.__enemy_kill > 100:
                     self.__current_wave = bonus_wave
+                elif (self.wave + 1) % 5 == 0 and self.__lives == 10:
+                    self.__current_wave = challenge_waves[self.wave // 5]
                 else:
+                    self.wave += 1
                     self.__current_wave = waves[self.wave]
                 self.pause = True
                 self.play_pause_button.pause = self.pause
@@ -183,7 +167,7 @@ class Game:
             # check for moving effect
             if self.moving_effect:
                 self.moving_effect.move(pos[0], pos[1])
-                if Game.point_to_line():
+                if self.point_to_line():
                     self.moving_effect.place_color = (255, 0, 0, 100)
                 else:
                     self.moving_effect.place_color = (0, 255, 0, 100)
@@ -193,7 +177,7 @@ class Game:
                 self.moving_object.move(pos[0], pos[1])
                 tower_list = self.attack_towers[:] + self.support_towers[:]
                 collide = False
-                if not Game.point_to_line():
+                if not self.point_to_line():
                     collide = True
                     self.moving_object.place_color = (255, 0, 0, 100)
                 else:
@@ -217,8 +201,35 @@ class Game:
 
                 # get pressed key
                 if event.type == pygame.KEYDOWN:
-                    if event.key == 96:  #
+
+                    if event.key == 96:  # ~
+                        self.is_input_chit = True
+
+                    if event.key == 13:  # Enter
+                        self.is_input_chit = False
+                        if self.current_chit_code == "money":
+                            self.__money += 1000
+                        elif self.current_chit_code == "lives":
+                            self.__lives += 5
+                        elif self.current_chit_code == "killall":
+                            for enemy in self.enemies:
+                                enemy.is_die = True
+
+                        self.current_chit_code = ""
+
+                    if self.is_input_chit:
+                        pressed_keys = event.dict['unicode']
+
+                        if event.key == pygame.K_BACKSPACE:
+                            self.current_chit_code = self.current_chit_code[:-1]
+
+                        if pressed_keys in string.ascii_letters or pressed_keys in string.digits:
+                            if len(self.current_chit_code) <= 17:
+                                self.current_chit_code += pressed_keys
+
+                    """if event.key == 96:  # ~
                         self.key_phrase_input = True
+                        self.pause = True
                         self.moving_effect = None
 
                     if event.key == 13:
@@ -228,7 +239,7 @@ class Game:
                         self.input_key_phrase.clear()
 
                     if self.key_phrase_input and event.key != 96:
-                        self.input_key_phrase.append(event.key)
+                        self.input_key_phrase.append(event.key)"""
 
                 if event.type == pygame.MOUSEBUTTONUP:
                     if self.moving_effect:
@@ -236,7 +247,7 @@ class Game:
                             self.moving_effect = None
                         else:
                             destroy = False
-                            if not Game.point_to_line():
+                            if not self.point_to_line():
                                 self.traps.append(self.moving_effect)
                                 self.__money -= self.moving_effect.cost
                                 destroy = True
@@ -260,7 +271,7 @@ class Game:
                             not_allowed = True
 
                         not_place_tower = False
-                        if not not_allowed and Game.point_to_line():
+                        if not not_allowed and self.point_to_line():
                             if self.moving_object.name in attack_tower_names:
                                 self.attack_towers.append(self.moving_object)
                             elif self.moving_object.name in support_tower_names:
@@ -369,7 +380,6 @@ class Game:
                 # delete all enemies off the screen
                 for d in to_del:
                     self.__lives -= 1
-
                     self.enemies.remove(d)
 
                 # if you lose
@@ -534,6 +544,14 @@ class Game:
         text = self.life_font.render("Wave #" + str(self.wave), 1, (255, 255, 255))
         self.win.blit(text, (10 + wave_bg.get_width() / 2 - text.get_width() / 2, 40))
 
+        # draw chit code input table
+        if self.is_input_chit:
+            self.win.blit(chit_code_table, (self.__width // 2 - 150, self.__height - 60))
+
+        if self.is_input_chit and self.current_chit_code:
+            output_chit_string = self.life_font.render(self.current_chit_code, 1, (0, 0, 0))
+            self.win.blit(output_chit_string, (self.__width // 2 - 100, self.__height - 40))
+
         pygame.display.update()
 
     def add_tower(self, name):
@@ -559,9 +577,32 @@ class Game:
         except Exception as e:
             print(str(e) + "NOT VALID NAME")
 
+    def clear_settings(self):
+        self.__money = 2000
+        self.__lives = 10
+        self.wave = 0
+        self.enemies.clear()
+        self.attack_towers.clear()
+        self.support_towers.clear()
+        self.traps.clear()
+        self.__enemy_kill = 0
+        self.__timer = time.time()
+        self.selected_tower = None
+        self.object_orientation.clear()
+        self.moving_object = None
+        self.moving_effect = None
+        self.__current_wave = waves[self.wave][:]
+        self.pause = True
+        self.music_on = True
+        self.is_input_chit = False
+        self.current_chit_code = ""
+        self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(), pause_btn.convert_alpha(), 10,
+                                                 self.__height - 85)
+        self.sound_button = PlayPauseButton(sound_btn.convert_alpha(), sound_btn_off.convert_alpha(), 90,
+                                            self.__height - 85)
+
 
 if __name__ == "__main__":
     win = pygame.display.set_mode((1250, 700))
     g = Game(win)
     g.run()
-

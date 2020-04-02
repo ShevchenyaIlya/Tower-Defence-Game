@@ -4,8 +4,8 @@ import sqlite3
 import string
 import time
 import datetime
-from towers.game import Game
-from towers.image_collection import ControlImageCollection
+from game.game import Game
+from game.image_collection import ControlImageCollection
 
 # Создание таблицы
 conn = sqlite3.connect("tower_defence_database.db")
@@ -53,6 +53,8 @@ class MainMenu:
         self.__username = ""
         self.__superuser_name = "TDgamecreator"
         self.start_input = False
+        self.__activate_game = False
+        self.attempt = 0
 
     def run(self):
         run = True
@@ -93,68 +95,77 @@ class MainMenu:
                     if self.__username:
                         if self.__btn[0] <= x <= self.__btn[0] + self.__btn[2]:
                             if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
-                                game = Game(self.__win)
+                                self.__activate_game = True
 
-                                before_interruption = 0
-                                for index, row in enumerate(db_rows):
-                                    if self.__username == row[0] and row[6] == "interrupted":
-                                        game.money = int(row[5])
-                                        game.wave = int(row[1])
-                                        game.lives = int(row[4])
-                                        game.enemy_kill = int(row[2])
-                                        before_interruption = float(row[7])
+                    if self.__activate_game:
+                        game = Game(self.__win)
 
-                                        cursor.execute("DELETE FROM information WHERE username=? AND result=? AND wave=? AND money=? AND lives=? AND enemy_kill = ?;", (self.__username, "interrupted", row[1], row[5], row[4], row[2]))
-                                        conn.commit()
-                                        break
+                        if not self.attempt:
+                            before_interruption = 0
+                            for index, row in enumerate(db_rows):
+                                if self.__username == row[0] and row[6] == "interrupted":
+                                    game.money = int(row[5])
+                                    game.wave = int(row[1])
+                                    game.lives = int(row[4])
+                                    game.enemy_kill = int(row[2])
+                                    before_interruption = float(row[7])
 
-                                if self.__username == self.__superuser_name:
-                                    game.money = 100000000000
-                                    game.lives = 100000000000
-
-                                start_timer = time.time()
-                                res = game.run()
-                                spend_time = time.time() - start_timer + before_interruption
-
-                                if res is None:
-                                    game_result = "interrupted"
-                                elif res:
-                                    game_result = "win"
-                                else:
-                                    game_result = "lose"
-
-                                if self.__username != self.__superuser_name:
-                                    write_data = [self.__username, game.wave, game.enemy_kill,
-                                                  datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), game.lives,
-                                                  game.money, game_result, spend_time]
-                                    cursor.execute("""INSERT INTO information VALUES (?, ?, ?, ?, ?, ?, ?, ?);""", write_data)
+                                    cursor.execute(
+                                        "DELETE FROM information WHERE username=? AND result=? AND wave=? AND money=? AND lives=? AND enemy_kill = ?;",
+                                        (self.__username, "interrupted", row[1], row[5], row[4], row[2]))
                                     conn.commit()
-
-                                if res is None:
-                                    del game
-                                    game_quit = True
-                                    run = False
                                     break
-                                elif res:
-                                    del game
-                                    win_or_lose = WinOrLose()
-                                    win_or_lose.win = True
-                                    game_quit = True
-                                    if win_or_lose.run():
-                                        run = True
-                                    else:
-                                        run = False
-                                        break
-                                elif not res:
-                                    del game
-                                    win_or_lose = WinOrLose()
-                                    win_or_lose.win = False
-                                    game_quit = True
-                                    if win_or_lose.run():
-                                        run = True
-                                    else:
-                                        run = False
-                                        break
+
+                            if self.__username == self.__superuser_name:
+                                game.money = 100000000000
+                                game.lives = 100000000000
+
+                        start_timer = time.time()
+                        res = game.run()
+                        spend_time = time.time() - start_timer + before_interruption
+
+                        if res is None:
+                            game_result = "interrupted"
+                        elif res:
+                            game_result = "win"
+                        else:
+                            game_result = "lose"
+
+                        if self.__username != self.__superuser_name:
+                            write_data = [self.__username, game.wave, game.enemy_kill,
+                                          datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), game.lives,
+                                          game.money, game_result, spend_time]
+                            cursor.execute("""INSERT INTO information VALUES (?, ?, ?, ?, ?, ?, ?, ?);""", write_data)
+                            conn.commit()
+
+                        if res is None:
+                            self.restart_game(game)
+                            game_quit = True
+                            run = False
+                            break
+                        elif res:
+                            self.restart_game(game)
+                            win_or_lose = WinOrLose()
+                            win_or_lose.win = True
+                            game_quit = True
+                            if win_or_lose.run():
+                                run = True
+                            else:
+                                run = False
+                                break
+                        elif not res:
+                            self.restart_game(game)
+                            win_or_lose = WinOrLose()
+                            win_or_lose.win = False
+                            game_quit = True
+                            if win_or_lose.run():
+                                run = True
+                            else:
+                                run = False
+                                break
+
+                        self.attempt += 1
+                        self.__activate_game = False
             if not game_quit:
                 self.draw()
 
@@ -191,6 +202,10 @@ class MainMenu:
             space_number = (17 - len(top_five[row][0]), 10 - len(top_five[row][1]))
             best_score = self.__score_font.render((top_five[row][0] + " " * space_number[0] + top_five[row][1] + " " * space_number[1] + top_five[row][2]), 1, (0, 0, 0))
             self.__win.blit(best_score, (65, self.__height / 2 + 30 + 30 * (row + 1)))
+
+    @staticmethod
+    def restart_game(game):
+        game.clear_settings()
 
 
 win_logo = ControlImageCollection("../game_assets/you_win.png", 1000, 250).download_image()

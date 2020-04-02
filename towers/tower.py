@@ -1,9 +1,9 @@
 import pygame
 from menu.menu import Menu
 import math
-from towers.positional_object import PositionalObject
-from towers.interfaces import ILocation, IUpgradable
-from towers.image_collection import ControlImageCollection
+from game.positional_object import PositionalObject
+from game.interfaces import ILocation, IUpgradable
+from game.image_collection import ControlImageCollection
 
 
 menu_background = ControlImageCollection("../game_assets/menu1.png", 150, 75).download_image()
