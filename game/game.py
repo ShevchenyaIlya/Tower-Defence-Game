@@ -81,11 +81,19 @@ class Game:
         self.__current_wave = waves[self.wave][:]
         self.pause = True
         self.music_on = True
-        self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(), pause_btn.convert_alpha(), 10, self.__height - 85)
-        self.sound_button = PlayPauseButton(sound_btn.convert_alpha(), sound_btn_off.convert_alpha(), 90, self.__height - 85)
+        self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(),
+                                                 pause_btn.convert_alpha(),
+                                                 10, self.__height - 85)
+        self.sound_button = PlayPauseButton(sound_btn.convert_alpha(),
+                                            sound_btn_off.convert_alpha(),
+                                            90, self.__height - 85)
 
-        self.stop_trap_btn = PlayPauseButton(stop_trap_img.convert_alpha(), stop_trap_img.convert_alpha(), 1000, self.__height - 90)
-        self.destroy_trap_btn = PlayPauseButton(destroying_trap_img.convert_alpha(), destroying_trap_img.convert_alpha(), 915, self.__height - 90)
+        self.stop_trap_btn = PlayPauseButton(stop_trap_img.convert_alpha(),
+                                             stop_trap_img.convert_alpha(),
+                                             1000, self.__height - 90)
+        self.destroy_trap_btn = PlayPauseButton(destroying_trap_img.convert_alpha(),
+                                                destroying_trap_img.convert_alpha(),
+                                                915, self.__height - 90)
 
         self.menu = VerticalMenu(self.__width - side_img.get_width() + 80, 190, side_img)
         self.menu.add_btn(tower_icon_img.images[3].convert_alpha(), "buy_archer_1", 500)
@@ -591,15 +599,13 @@ class Game:
         self.object_orientation.clear()
         self.moving_object = None
         self.moving_effect = None
-        self.__current_wave = waves[self.wave][:]
+        self.__current_wave = waves[0][:]
         self.pause = True
         self.music_on = True
         self.is_input_chit = False
         self.current_chit_code = ""
-        self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(), pause_btn.convert_alpha(), 10,
-                                                 self.__height - 85)
-        self.sound_button = PlayPauseButton(sound_btn.convert_alpha(), sound_btn_off.convert_alpha(), 90,
-                                            self.__height - 85)
+        self.play_pause_button.pause = True
+        self.sound_button.pause = True
 
 
 if __name__ == "__main__":

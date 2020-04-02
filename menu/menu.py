@@ -137,7 +137,7 @@ class PlayPauseButton(Button):
         self.width = self.img.get_width()
         self.height = self.img.get_height()
         self.pause = True
-        self.font = pygame.font.SysFont("conicsans", 23)
+        self.font = pygame.font.SysFont("comicsans", 23)
 
     def draw(self, win):
         if self.pause:
