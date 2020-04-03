@@ -211,7 +211,11 @@ class Game:
                 if event.type == pygame.KEYDOWN:
 
                     if event.key == 96:  # ~
-                        self.is_input_chit = True
+                        if self.is_input_chit:
+                            self.is_input_chit = False
+                            self.current_chit_code = ""
+                        else:
+                            self.is_input_chit = True
 
                     if event.key == 13:  # Enter
                         self.is_input_chit = False

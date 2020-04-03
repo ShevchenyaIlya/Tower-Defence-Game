@@ -69,6 +69,9 @@ class MainMenu:
                     if event.key == pygame.K_TAB:
                         self.start_input = not self.start_input
 
+                    if self.__username and event.key == 13:
+                        self.__activate_game = True
+
                     if self.start_input:
                         pressed_keys = event.dict['unicode']
 
@@ -97,75 +100,75 @@ class MainMenu:
                             if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
                                 self.__activate_game = True
 
-                    if self.__activate_game:
-                        game = Game(self.__win)
+                if self.__activate_game:
+                    game = Game(self.__win)
 
-                        if not self.attempt:
-                            before_interruption = 0
-                            for index, row in enumerate(db_rows):
-                                if self.__username == row[0] and row[6] == "interrupted":
-                                    game.money = int(row[5])
-                                    game.wave = int(row[1])
-                                    game.lives = int(row[4])
-                                    game.enemy_kill = int(row[2])
-                                    before_interruption = float(row[7])
+                    if not self.attempt:
+                        before_interruption = 0
+                        for index, row in enumerate(db_rows):
+                            if self.__username == row[0] and row[6] == "interrupted":
+                                game.money = int(row[5])
+                                game.wave = int(row[1])
+                                game.lives = int(row[4])
+                                game.enemy_kill = int(row[2])
+                                before_interruption = float(row[7])
 
-                                    cursor.execute(
-                                        "DELETE FROM information WHERE username=? AND result=? AND wave=? AND money=? AND lives=? AND enemy_kill = ?;",
-                                        (self.__username, "interrupted", row[1], row[5], row[4], row[2]))
-                                    conn.commit()
-                                    break
+                                cursor.execute(
+                                    "DELETE FROM information WHERE username=? AND result=? AND wave=? AND money=? AND lives=? AND enemy_kill = ?;",
+                                    (self.__username, "interrupted", row[1], row[5], row[4], row[2]))
+                                conn.commit()
+                                break
 
-                            if self.__username == self.__superuser_name:
-                                game.money = 100000000000
-                                game.lives = 100000000000
+                        if self.__username == self.__superuser_name:
+                            game.money = 100000000000
+                            game.lives = 100000000000
 
-                        start_timer = time.time()
-                        res = game.run()
-                        spend_time = time.time() - start_timer + before_interruption
+                    start_timer = time.time()
+                    res = game.run()
+                    spend_time = time.time() - start_timer + before_interruption
 
-                        if res is None:
-                            game_result = "interrupted"
-                        elif res:
-                            game_result = "win"
+                    if res is None:
+                        game_result = "interrupted"
+                    elif res:
+                        game_result = "win"
+                    else:
+                        game_result = "lose"
+
+                    if self.__username != self.__superuser_name:
+                        write_data = [self.__username, game.wave, game.enemy_kill,
+                                      datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), game.lives,
+                                      game.money, game_result, spend_time]
+                        cursor.execute("""INSERT INTO information VALUES (?, ?, ?, ?, ?, ?, ?, ?);""", write_data)
+                        conn.commit()
+
+                    if res is None:
+                        self.restart_game(game)
+                        game_quit = True
+                        run = False
+                        break
+                    elif res:
+                        self.restart_game(game)
+                        win_or_lose = WinOrLose()
+                        win_or_lose.win = True
+                        game_quit = True
+                        if win_or_lose.run():
+                            run = True
                         else:
-                            game_result = "lose"
-
-                        if self.__username != self.__superuser_name:
-                            write_data = [self.__username, game.wave, game.enemy_kill,
-                                          datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), game.lives,
-                                          game.money, game_result, spend_time]
-                            cursor.execute("""INSERT INTO information VALUES (?, ?, ?, ?, ?, ?, ?, ?);""", write_data)
-                            conn.commit()
-
-                        if res is None:
-                            self.restart_game(game)
-                            game_quit = True
                             run = False
                             break
-                        elif res:
-                            self.restart_game(game)
-                            win_or_lose = WinOrLose()
-                            win_or_lose.win = True
-                            game_quit = True
-                            if win_or_lose.run():
-                                run = True
-                            else:
-                                run = False
-                                break
-                        elif not res:
-                            self.restart_game(game)
-                            win_or_lose = WinOrLose()
-                            win_or_lose.win = False
-                            game_quit = True
-                            if win_or_lose.run():
-                                run = True
-                            else:
-                                run = False
-                                break
+                    elif not res:
+                        self.restart_game(game)
+                        win_or_lose = WinOrLose()
+                        win_or_lose.win = False
+                        game_quit = True
+                        if win_or_lose.run():
+                            run = True
+                        else:
+                            run = False
+                            break
 
-                        self.attempt += 1
-                        self.__activate_game = False
+                    self.attempt += 1
+                    self.__activate_game = False
             if not game_quit:
                 self.draw()
 
