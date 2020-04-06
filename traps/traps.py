@@ -66,7 +66,7 @@ class Trap:
         """
         for enemy in enemies:
             if self.x + self.width // 2 - 28 <= enemy.x <= self.x + self.width // 2 + 35 and self.y + self.height // 2 - 40 <= enemy.y <= self.y + self.height // 2 + 40:
-                enemy.stop_by_trap = self
+                enemy.to_stopped_by_trap(self)
 
     def hit(self, damage):
         """
@@ -102,7 +102,7 @@ class Trap:
             for enemy in enemies:
                 if self.x + self.width // 2 - 28 <= enemy.x <= self.x + self.width // 2 + 35 and self.y + self.height // 2 - 40 <= enemy.y <= self.y + self.height // 2 + 40:
                     if enemy.hit(self.damage):
-                        enemy.is_die = True
+                        enemy.to_dying()
             traps.remove(self)
 
 

@@ -17,7 +17,7 @@ class Troll(enemy.Enemy):
         super().__init__()
         self.name = "troll"
         self.money = 3
-        self.imgs = imgs.images[:]
+        self.active_imgs = imgs.images[:]
         self.max_health = 3
         self.damage = 1
         self.armor = 2

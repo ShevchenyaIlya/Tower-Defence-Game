@@ -22,7 +22,7 @@ class Wizard(enemy.Enemy):
         self.armor = 0
         self.magick_resist = 4
         self.health = self.max_health
-        self.imgs = imgs.images[:]
+        self.active_imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]
         self.die_imgs = die_imgs.images[:]
 

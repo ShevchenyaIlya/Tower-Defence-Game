@@ -225,7 +225,7 @@ class Game:
                             self.__lives += 5
                         elif self.current_chit_code == "killall":
                             for enemy in self.enemies:
-                                enemy.is_die = True
+                                enemy.to_dying()
 
                         self.current_chit_code = ""
 
@@ -374,17 +374,16 @@ class Game:
                 # loop through enemies
                 to_del = []
                 for en in self.enemies:
-                    if not en.is_die:
-                        if not en.stop_by_trap:
-                            en.move()
-                            if en.x < -15:
-                                to_del.append(en)
-                        else:
-                            en.animate_attack()
-                            en.stop_by_trap.is_attacked = True
-                    else:
+                    if en.is_die:
                         if en.animate_die(self.enemies):
                             self.__enemy_kill += 1
+                    elif en.is_stopped_by_trap:
+                        en.animate_attack()
+                        en.stop_by_trap.is_attacked = True
+                    else:
+                        en.move()
+                        if en.x < -15:
+                            to_del.append(en)
 
                 for enemy in self.enemies:
                     enemy.attack(self.traps)

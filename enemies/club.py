@@ -20,7 +20,7 @@ class Club(enemy.Enemy):
         self.damage = 1
         self.armor = 3
         self.magick_resist = 2
-        self.imgs = imgs.images[:]
+        self.active_imgs = imgs.images[:]
         self.attack_imgs = attack_imgs.images[:]
         self.die_imgs = die_imgs.images[:]
         self.max_health = 5
