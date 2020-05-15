@@ -150,7 +150,9 @@ class MainMenu:
                                     if self.__btn[1] <= y <= self.__btn[1] + self.__btn[3]:
                                         self.__choose_map = True
                         else:
-                            if self.game_map == Map.FIRST_MAP or self.game_map == Map.SECOND_MAP:
+                            if self.game_map == Map.FIRST_MAP\
+                                    or self.game_map == Map.SECOND_MAP\
+                                    or self.game_map == Map.THIRD_MAP:
                                 self.__activate_game = True
                     else:
                         if self.__btn[0] + self.__width / 4 <= x <= self.__btn[0] + self.__btn[2] + self.__width / 4:
@@ -165,7 +167,6 @@ class MainMenu:
                         before_interruption = 0
                         for index, row in enumerate(db_rows):
                             if self.__username == row[0] and row[6] == "interrupted":
-                                print("in")
                                 saved_map = str(row[8])
                                 game_map = ""
 
@@ -179,7 +180,6 @@ class MainMenu:
                                     game_map = Map.FOURTH_MAP
 
                                 if self.game_map == game_map:
-                                    print("in in")
                                     game.money = int(row[5])
                                     game.wave = int(row[1])
                                     game.lives = int(row[4])
@@ -303,8 +303,8 @@ class MainMenu:
                     pygame.draw.rect(self.__win, (0, 128, 255, 200), (self.__width / 2, self.__height / 2,
                                                                       self.__width, self.__height), 5)
 
-                self.__win.blit(coming_soon_logo, (self.__width / 4 - 150,
-                                                   self.__height * (1 / 4) - 75))
+                # self.__win.blit(coming_soon_logo, (self.__width / 4 - 150,
+                #                                    self.__height * (1 / 4) - 75))
                 self.__win.blit(coming_soon_logo, (self.__width * (3 / 4) - 100,
                                                    self.__height * (3 / 4) - 75))
         else:
