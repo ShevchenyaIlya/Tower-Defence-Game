@@ -50,8 +50,7 @@ tower_icon_img.download_tower()
 attack_tower_names = ["archer_long", "archer_short"]
 support_tower_names = ["range", "damage"]
 
-# load music
-pygame.mixer.music.load(os.path.join("../game_assets", "bensound-funnysong.wav"))
+points = []
 
 
 @Singleton
@@ -118,6 +117,10 @@ class Game:
         elif self.game_map == Map.SECOND_MAP:
             self.bg = pygame.image.load(os.path.join("../game_assets/background_3.png")).convert_alpha()
             self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+        elif self.game_map == Map.THIRD_MAP:
+            self.bg = pygame.image.load(os.path.join("../game_assets/background_2.png")).convert_alpha()
+            self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+
         Game.path = Path.get_path(self.game_map)
 
     @property
@@ -161,8 +164,9 @@ class Game:
                 self.pause = True
                 self.play_pause_button.pause = self.pause
         else:
-            wave_enemies = [Scorpion(Game.path), Wizard(Game.path), Club(Game.path),
-                            Troll(Game.path), Sword(Game.path), Goblin(Game.path)]
+            wave_enemies = [Scorpion(Game.path, self.game_map), Wizard(Game.path, self.game_map),
+                            Club(Game.path, self.game_map), Troll(Game.path, self.game_map),
+                            Sword(Game.path, self.game_map), Goblin(Game.path, self.game_map)]
 
             for x in range(len(self.__current_wave)):
                 if self.__current_wave[x] != 0:
@@ -171,6 +175,14 @@ class Game:
                     break
 
     def run(self):
+        # load music
+        if self.game_map == Map.FIRST_MAP:
+            pygame.mixer.music.load(os.path.join("../game_assets", "bensound-funnysong.wav"))
+        elif self.game_map == Map.SECOND_MAP:
+            pygame.mixer.music.load(os.path.join("../game_assets", "Fender_Bender.mp3"))
+        elif self.game_map == Map.THIRD_MAP:
+            pygame.mixer.music.load(os.path.join("../game_assets", "Shibuya.mp3"))
+
         pygame.mixer.music.play(loops=-1)
         run = True
 
@@ -271,6 +283,8 @@ class Game:
                         self.input_key_phrase.append(event.key)"""
 
                 if event.type == pygame.MOUSEBUTTONUP:
+                    points.append(pos)
+                    print(points)
                     if self.moving_effect:
                         if event.button == 3:
                             self.moving_effect = None
@@ -399,8 +413,12 @@ class Game:
                         en.stop_by_trap.is_attacked = True
                     else:
                         en.move()
-                        if en.x < -15:
-                            to_del.append(en)
+                        if self.game_map == Map.SECOND_MAP or self.game_map == Map.THIRD_MAP:
+                            if en.y > 715:
+                                to_del.append(en)
+                        elif self.game_map == Map.FIRST_MAP:
+                            if en.x < -15:
+                                to_del.append(en)
 
                 for enemy in self.enemies:
                     enemy.attack(self.traps)
@@ -469,8 +487,8 @@ class Game:
         # draw background
         self.win.blit(self.bg, (0, 0))
 
-        # for point in points:
-        #     pygame.draw.circle(self.win, (255, 0, 0), point, 3)
+        for point in points:
+            pygame.draw.circle(self.win, (255, 0, 0), point, 3)
 
         # draw placement rings
         if self.moving_object:
