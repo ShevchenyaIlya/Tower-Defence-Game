@@ -13,8 +13,8 @@ die_imgs.download_images()
 
 
 class Wizard(enemy.Enemy):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, path):
+        super().__init__(path)
         self.name = "wizard"
         self.money = 3
         self.max_health = 3

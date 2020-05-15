@@ -13,8 +13,8 @@ die_imgs.download_images()
 
 
 class Sword(enemy.Enemy):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, path):
+        super().__init__(path)
         self.name = "sword"
         self.money = 50
         self.max_health = 100
