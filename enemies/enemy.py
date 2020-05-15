@@ -1,7 +1,9 @@
 import pygame
 import math
+
 from game.positional_object import PositionalObject
 from game.interfaces import ILocation, IMovable
+from game.path_settings import Path
 
 
 class States:
@@ -11,7 +13,7 @@ class States:
 
 
 class Enemy(PositionalObject, ILocation, IMovable):
-    def __init__(self):
+    def __init__(self, path):
         super().__init__()
         self.width = 64
         self.height = 64
@@ -21,10 +23,8 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.magick_resist = 0
         self.damage = 0
         self.vel = 3
-        self.path = [(-10, 225), (14, 224), (165, 225), (216, 252), (269, 282), (555, 284), (619, 248), (639, 179),
-                     (687, 74), (750, 52), (813, 70), (852, 116), (870, 187), (911, 257), (983, 276), (1055, 308),
-                     (1082, 385), (1071, 454), (1019, 496), (797, 501), (715, 543), (412, 554), (163, 548), (98, 484),
-                     (81, 393), (18, 339), (-30, 335)]
+        self.path = path
+
         self.x = self.path[0][0]
         self.y = self.path[0][1]
         self.path_pos = 0
