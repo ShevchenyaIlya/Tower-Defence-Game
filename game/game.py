@@ -1,6 +1,10 @@
 import pygame
 import os
 import string
+import time
+import random
+import math
+
 from enemies.scorpion import Scorpion
 from enemies.club import Club
 from enemies.wizard import Wizard
@@ -14,19 +18,13 @@ from menu.menu import VerticalMenu, PlayPauseButton
 from game.image_collection import ControlImageCollection, ImageCollection
 from game.level_settings import waves, bonus_wave, challenge_waves
 from game.singleton import Singleton
-import time
-import random
-import math
+from map.game_map import Map
+from game.path_settings import Path
+
 pygame.font.init()
 pygame.mixer.pre_init(22050, -16, 2, 64)
 pygame.mixer.init()
-pygame.init()
-
-path = [(-10, 225), (14, 224), (90, 225), (165, 225), (216, 252), (269, 282), (341, 282), (412, 283), (484, 284),
-        (555, 284), (619, 248), (639, 179), (687, 74), (750, 52), (813, 70), (852, 116), (870, 187), (911, 257),
-        (983, 276), (1055, 308), (1082, 385), (1071, 454), (1019, 496), (908, 500), (797, 501), (715, 543), (564, 546),
-        (412, 556), (288, 554), (163, 548), (98, 484), (81, 393), (18, 339), (-30, 335)]
-
+# pygame.init()
 
 lives_img = ControlImageCollection("../game_assets/heart2.png", 36, 36).download_image()
 star_img = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
@@ -58,7 +56,9 @@ pygame.mixer.music.load(os.path.join("../game_assets", "bensound-funnysong.wav")
 
 @Singleton
 class Game:
-    def __init__(self, win):
+    path = []
+
+    def __init__(self, win, username):
         self.__width = 1250
         self.__height = 700
         self.win = win
@@ -69,18 +69,21 @@ class Game:
         self.__lives = 10
         self.__money = 200000
         self.__enemy_kill = 0
-        self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
+        self.bg = pygame.image.load(os.path.join("../game_assets/background_3.png")).convert_alpha()
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+        self.game_map = None
         self.__timer = time.time()
         self.life_font = pygame.font.SysFont("life count", 30)
+        self.username_font = pygame.font.SysFont(pygame.font.get_default_font(), 40)
         self.selected_tower = None
         self.object_orientation = []
         self.moving_object = None
         self.moving_effect = None
-        self.wave = 0
+        self.wave = 15
         self.__current_wave = waves[self.wave][:]
         self.pause = True
         self.music_on = True
+        self.username = username
         self.play_pause_button = PlayPauseButton(play_btn.convert_alpha(),
                                                  pause_btn.convert_alpha(),
                                                  10, self.__height - 85)
@@ -103,6 +106,19 @@ class Game:
 
         self.is_input_chit = False
         self.current_chit_code = ""
+
+    def game_map(self):
+        return self.game_map
+
+    def set_game_map(self, value):
+        self.game_map = value
+        if self.game_map == Map.FIRST_MAP:
+            self.bg = pygame.image.load(os.path.join("../game_assets/background_1.png")).convert_alpha()
+            self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+        elif self.game_map == Map.SECOND_MAP:
+            self.bg = pygame.image.load(os.path.join("../game_assets/background_3.png")).convert_alpha()
+            self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+        Game.path = Path.get_path(self.game_map)
 
     @property
     def enemy_kill(self):
@@ -145,7 +161,8 @@ class Game:
                 self.pause = True
                 self.play_pause_button.pause = self.pause
         else:
-            wave_enemies = [Scorpion(), Wizard(), Club(), Troll(), Sword(), Goblin()]
+            wave_enemies = [Scorpion(Game.path), Wizard(Game.path), Club(Game.path),
+                            Troll(Game.path), Sword(Game.path), Goblin(Game.path)]
 
             for x in range(len(self.__current_wave)):
                 if self.__current_wave[x] != 0:
@@ -419,15 +436,15 @@ class Game:
         """
         # find two closest points
         tower_x, tower_y = pygame.mouse.get_pos()
-        first_closest_point = path[0]
+        first_closest_point = Game.path[0]
 
-        for position, point in enumerate(path[1:]):
+        for position, point in enumerate(Game.path[1:]):
             dis = math.sqrt((point[0] - tower_x) ** 2 + (point[1] - tower_y) ** 2)
             if math.sqrt((first_closest_point[0] - tower_x) ** 2 + (first_closest_point[1] - tower_y) ** 2) > dis:
                 first_closest_point = (point[0], point[1], position)
 
-        if (first_closest_point[0], first_closest_point[1]) != path[0]:
-            prev_point, next_point = path[first_closest_point[2] - 1], path[first_closest_point[2] + 1]
+        if (first_closest_point[0], first_closest_point[1]) != Game.path[0]:
+            prev_point, next_point = Game.path[first_closest_point[2] - 1], Game.path[first_closest_point[2] + 1]
             first_distance = math.sqrt((prev_point[0] - tower_x) ** 2 + (prev_point[1] - tower_y) ** 2)
             second_distance = math.sqrt((next_point[0] - tower_x) ** 2 + (next_point[1] - tower_y) ** 2)
             if first_distance > second_distance:
@@ -435,7 +452,7 @@ class Game:
             else:
                 second_closest_point = next_point
         else:
-            second_closest_point = path[1]
+            second_closest_point = Game.path[1]
 
         # |ax + by + c|/(sqrt(a^2 + b^2))
         a = second_closest_point[1] - first_closest_point[1]
@@ -452,8 +469,8 @@ class Game:
         # draw background
         self.win.blit(self.bg, (0, 0))
 
-        """for point in path:
-            pygame.draw.circle(self.win, (255, 0, 0), point, 3)"""
+        # for point in points:
+        #     pygame.draw.circle(self.win, (255, 0, 0), point, 3)
 
         # draw placement rings
         if self.moving_object:
@@ -536,6 +553,11 @@ class Game:
         self.win.blit(text, (start_x - text.get_width(), 20))
         self.win.blit(life, (start_x, 8))
 
+        # draw username
+        username = self.username_font.render(self.username, 1, (255, 255, 255))
+        start_x = self.__width - life.get_width() - 50
+        self.win.blit(username, (start_x - username.get_width(), 15))
+
         # draw currency
         text = self.life_font.render(str(self.__money), 1, (255, 255, 255))
         start_x = self.__width - life.get_width() - 10
@@ -587,6 +609,9 @@ class Game:
             self.moving_effect = obj
         except Exception as e:
             print(str(e) + "NOT VALID NAME")
+
+    def get_score(self):
+        return self.wave, self.enemy_kill
 
     def clear_settings(self):
         self.__money = 2000
