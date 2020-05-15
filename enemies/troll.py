@@ -13,8 +13,8 @@ die_imgs.download_images()
 
 
 class Troll(enemy.Enemy):
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, path, game_map):
+        super().__init__(path, game_map)
         self.name = "troll"
         self.money = 3
         self.active_imgs = imgs.images[:]

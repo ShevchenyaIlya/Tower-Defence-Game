@@ -13,8 +13,8 @@ die_imgs.download_images()
 
 
 class Club(enemy.Enemy):
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, path, game_map):
+        super().__init__(path, game_map)
         self.name = "club"
         self.money = 5
         self.damage = 1

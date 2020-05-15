@@ -3,7 +3,7 @@ import math
 
 from game.positional_object import PositionalObject
 from game.interfaces import ILocation, IMovable
-from game.path_settings import Path
+from map.game_map import Map
 
 
 class States:
@@ -13,7 +13,7 @@ class States:
 
 
 class Enemy(PositionalObject, ILocation, IMovable):
-    def __init__(self, path):
+    def __init__(self, path, game_map):
         super().__init__()
         self.width = 64
         self.height = 64
@@ -24,6 +24,7 @@ class Enemy(PositionalObject, ILocation, IMovable):
         self.damage = 0
         self.vel = 3
         self.path = path
+        self.game_map = game_map
 
         self.x = self.path[0][0]
         self.y = self.path[0][1]
@@ -125,6 +126,18 @@ class Enemy(PositionalObject, ILocation, IMovable):
                 return True
         return False
 
+    def flip_images(self):
+        """
+        Flip all images when enemy rotates
+        :return: None
+        """
+        for index, img in enumerate(self.active_imgs):
+            self.active_imgs[index] = pygame.transform.flip(img, True, False)
+        for index, img in enumerate(self.attack_imgs):
+            self.attack_imgs[index] = pygame.transform.flip(img, True, False)
+        for index, img in enumerate(self.die_imgs):
+            self.die_imgs[index] = pygame.transform.flip(img, True, False)
+
     def move(self):
         """
         Move enemy
@@ -136,7 +149,12 @@ class Enemy(PositionalObject, ILocation, IMovable):
 
         x1, y1 = self.path[self.path_pos]
         if self.path_pos + 1 >= len(self.path):
-            x2, y2 = (-10, 355)
+            if self.game_map == Map.FIRST_MAP:
+                x2, y2 = (-10, 355)
+            elif self.game_map == Map.SECOND_MAP:
+                x2, y2 = (1250, 730)
+            elif self.game_map == Map.THIRD_MAP:
+                x2, y2 = (784, 730)
         else:
             x2, y2 = self.path[self.path_pos + 1]
 
@@ -146,12 +164,10 @@ class Enemy(PositionalObject, ILocation, IMovable):
 
         if dirn[0] < 0 and not self.flipped:
             self.flipped = True
-            for index, img in enumerate(self.active_imgs):
-                self.active_imgs[index] = pygame.transform.flip(img, True, False)
-            for index, img in enumerate(self.attack_imgs):
-                self.attack_imgs[index] = pygame.transform.flip(img, True, False)
-            for index, img in enumerate(self.die_imgs):
-                self.die_imgs[index] = pygame.transform.flip(img, True, False)
+            self.flip_images()
+        elif dirn[0] > 0 and self.flipped:
+            self.flipped = False
+            self.flip_images()
 
         move_x, move_y = ((self.x + dirn[0]), (self.y + dirn[1]))
 
