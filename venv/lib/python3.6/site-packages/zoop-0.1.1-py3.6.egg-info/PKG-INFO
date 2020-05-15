@@ -1,0 +1,75 @@
+Metadata-Version: 1.1
+Name: zoop
+Version: 0.1.1
+Summary: Pythonic API and common paradigms for Zookeeper
+Home-page: http://github.com/davidmiller/zoop
+Author: David Miller
+Author-email: david@deadpansincerity.com
+License: UNKNOWN
+Description: Zoop - ZooKeeper for Python!
+        ============================
+        
+        `Zookeeper`_ is a highly reliable distributed coordination service.
+        
+        *Zoop* gives you a Pythonic API for accessing ZooKeeper instances, as well as
+        implementations of some common ZooKeeper patterns. This leaves you free to
+        concentrate on whatever it was you were originally doing::
+        
+            >>> zk =  zoop.ZooKeeper('localhost:2181')
+            >>> zk.connect()
+            >>> q = zk.Queue('/howdy')
+            >>> def gotit(data):
+            ...     print "Gotit got data:", data
+            >>> q.watch(gotit)
+            >>> q.put("frist!")
+            Gotit got data: frist!
+        
+        
+        .. _Zookeeper: http://zookeeper.apache.org/
+        
+        .. image:: https://secure.travis-ci.org/davidmiller/zoop.png?branch=master
+           :alt: Build Status
+           :target: https://secure.travis-ci.org/davidmiller/zoop
+        
+        Check out:
+        
+        `Documentation`_
+        
+        `Source`_
+        
+        `Issues`_
+        
+        .. _Documentation: http://www.deadpansincerity.com/docs/zoop/
+        .. _Source: https://github.com/davidmiller/zoop
+        .. _Issues: https://github.com/davidmiller/zoop/issues
+        
+        
+        History
+        -------
+        
+        0.1.1
+        +++++
+        
+        Expanding the Filesystem metaphor:
+        Client now has rm_rf() and rm() methods
+        
+        Queues now have variable item prefix (Useful for watching Queues created by other libraries)
+        Queues now have multiple watch options - watch for lists of items, or data added.
+        
+        0.1 (2012-05-07)
+        ++++++++++++++++++
+        
+        Initial release with
+        * complete CRUD
+        * Lock Implementation
+        * Queue Implementation
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 2.6
+Classifier: License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries

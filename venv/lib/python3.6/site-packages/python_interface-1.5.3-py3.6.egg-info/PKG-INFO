@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: python-interface
+Version: 1.5.3
+Summary: Pythonic Interface definitions
+Home-page: https://github.com/ssanderson/interface
+Author: Scott Sanderson
+Author-email: scott.b.sanderson90@gmail.com
+License: Apache 2.0
+Description: ``interface``
+        =============
+        
+        |build status|
+        
+        ``interface`` is a library for declaring interfaces and for statically
+        asserting that classes implement those interfaces. It aims to provide stricter
+        semantics and better error messages than Python's built-in ``abc`` module.
+        
+        ``interface`` supports Python 2.7 and Python 3.4+.
+        
+        For more information, see our `documentation`_.
+        
+        Installation
+        ~~~~~~~~~~~~
+        
+        .. code-block:: shell
+        
+           $ pip install python-interface
+        
+        .. _`documentation` : http://interface.readthedocs.io
+        .. |build status| image:: https://travis-ci.org/ssanderson/interface.svg?branch=master
+           :target: https://travis-ci.org/ssanderson/interface
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Software Development :: Pre-processors
+Provides-Extra: test
