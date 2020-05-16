@@ -35,6 +35,7 @@ chit_code_table = ControlImageCollection("../game_assets/vertical_menu_1.png", 3
 play_btn = ControlImageCollection("../game_assets/play_button_1.png", 75, 75).download_image()
 pause_btn = ControlImageCollection("../game_assets/pause_button.png", 75, 75).download_image()
 wave_bg = ControlImageCollection("../game_assets/wave.png", 200, 75).download_image()
+username_bg = ControlImageCollection("../game_assets/wave.png", 300, 50).download_image()
 small_star = ControlImageCollection("../game_assets/star1.png", 36, 36).download_image()
 
 sound_btn = ControlImageCollection("../game_assets/music_icon.png", 75, 75).download_image()
@@ -120,6 +121,9 @@ class Game:
         elif self.game_map == Map.THIRD_MAP:
             self.bg = pygame.image.load(os.path.join("../game_assets/background_2.png")).convert_alpha()
             self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
+        elif self.game_map == Map.FOURTH_MAP:
+            self.bg = pygame.image.load(os.path.join("../game_assets/background_4.png")).convert_alpha()
+            self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
 
         Game.path = Path.get_path(self.game_map)
 
@@ -182,6 +186,8 @@ class Game:
             pygame.mixer.music.load(os.path.join("../game_assets", "Fender_Bender.mp3"))
         elif self.game_map == Map.THIRD_MAP:
             pygame.mixer.music.load(os.path.join("../game_assets", "Shibuya.mp3"))
+        elif self.game_map == Map.FOURTH_MAP:
+            pygame.mixer.music.load(os.path.join("../game_assets", "Snow_Princess.mp3"))
 
         pygame.mixer.music.play(loops=-1)
         run = True
@@ -419,6 +425,9 @@ class Game:
                         elif self.game_map == Map.FIRST_MAP:
                             if en.x < -15:
                                 to_del.append(en)
+                        elif self.game_map == Map.FOURTH_MAP:
+                            if en.x > 1265:
+                                to_del.append(en)
 
                 for enemy in self.enemies:
                     enemy.attack(self.traps)
@@ -563,8 +572,13 @@ class Game:
         # draw music toggle button
         self.sound_button.draw(self.win)
 
+        if self.game_map == Map.FOURTH_MAP:
+            statistic_color = (0, 0, 0)
+        else:
+            statistic_color = (255, 255, 255)
+
         # draw lives
-        text = self.life_font.render(str(self.__lives), 1, (255, 255, 255))
+        text = self.life_font.render(str(self.__lives), 1, statistic_color)
         life = lives_img
         start_x = self.__width - life.get_width() - 10
 
@@ -573,18 +587,20 @@ class Game:
 
         # draw username
         username = self.username_font.render(self.username, 1, (255, 255, 255))
-        start_x = self.__width - life.get_width() - 50
-        self.win.blit(username, (start_x - username.get_width(), 15))
+        username_bg_transformed = pygame.transform.scale(username_bg, (username.get_width() + 100, username.get_height() + 25))
+        start_x = self.__width - life.get_width() - text.get_width() - 30
+        self.win.blit(username_bg_transformed, (start_x - username_bg_transformed.get_width(), 5))
+        self.win.blit(username, (start_x - username_bg_transformed.get_width() + 55, 23))
 
         # draw currency
-        text = self.life_font.render(str(self.__money), 1, (255, 255, 255))
+        text = self.life_font.render(str(self.__money), 1, statistic_color)
         start_x = self.__width - life.get_width() - 10
 
         self.win.blit(text, (start_x - text.get_width(), 55))
         self.win.blit(star_img, (start_x, 40))
 
         # draw kills
-        number_of_kills = self.life_font.render(str(self.__enemy_kill), 1, (255, 255, 255))
+        number_of_kills = self.life_font.render(str(self.__enemy_kill), 1, statistic_color)
         start_x = self.__width - life.get_width() - 10
 
         self.win.blit(number_of_kills, (start_x - number_of_kills.get_width(), 85))
