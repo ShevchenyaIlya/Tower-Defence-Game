@@ -92,6 +92,7 @@ class MainMenu:
         self.attempt = 0
         self.user_score = None
         self.game_map = Map.FIRST_MAP
+        self.notification_position = -100
 
     def run(self):
         run = True
@@ -335,6 +336,12 @@ class MainMenu:
             self.__win.blit(try_again_logo, (self.__width * (3 / 4) - try_again_logo.get_width() / 2,
                                              self.__height / 2 - try_again_logo.get_height() / 2 - 50))
             self.__win.blit(start_btn, (self.__btn[0] + self.__width / 4, self.__btn[1]))
+
+            notification = self.__text_font.render("Visit our website: http://localhost:8000/", 1, (0, 0, 0))
+            self.__win.blit(notification, (self.notification_position, 660))
+            self.notification_position += 1
+            if self.notification_position >= 1265:
+                self.notification_position = -notification.get_width()
 
         pygame.display.update()
 
