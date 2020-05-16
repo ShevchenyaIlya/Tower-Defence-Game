@@ -51,7 +51,7 @@ tower_icon_img.download_tower()
 attack_tower_names = ["archer_long", "archer_short"]
 support_tower_names = ["range", "damage"]
 
-points = []
+# points = []
 
 
 @Singleton
@@ -289,8 +289,9 @@ class Game:
                         self.input_key_phrase.append(event.key)"""
 
                 if event.type == pygame.MOUSEBUTTONUP:
-                    points.append(pos)
-                    print(points)
+                    # points.append(pos)
+                    # print(points)
+
                     if self.moving_effect:
                         if event.button == 3:
                             self.moving_effect = None
@@ -496,8 +497,8 @@ class Game:
         # draw background
         self.win.blit(self.bg, (0, 0))
 
-        for point in points:
-            pygame.draw.circle(self.win, (255, 0, 0), point, 3)
+        # for point in points:
+        #     pygame.draw.circle(self.win, (255, 0, 0), point, 3)
 
         # draw placement rings
         if self.moving_object:
