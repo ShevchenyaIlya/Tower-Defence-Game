@@ -79,6 +79,7 @@ class MainMenu:
         self.bg = pygame.image.load(os.path.join("../game_assets/hole_backgrounds.png"))
         self.bg = pygame.transform.scale(self.bg, (self.__width, self.__height))
         self.__btn = (self.__width / 2 - start_btn.get_width() / 2, 350, start_btn.get_width(), start_btn.get_height())
+        self.__big_text_font = pygame.font.SysFont("username", 80)
         self.__text_font = pygame.font.SysFont("username", 50)
         self.__score_font = pygame.font.SysFont("monospace", 20, 1)
         self.__username = ""
@@ -152,7 +153,8 @@ class MainMenu:
                         else:
                             if self.game_map == Map.FIRST_MAP\
                                     or self.game_map == Map.SECOND_MAP\
-                                    or self.game_map == Map.THIRD_MAP:
+                                    or self.game_map == Map.THIRD_MAP\
+                                    or self.game_map == Map.FOURTH_MAP:
                                 self.__activate_game = True
                     else:
                         if self.__btn[0] + self.__width / 4 <= x <= self.__btn[0] + self.__btn[2] + self.__width / 4:
@@ -305,8 +307,8 @@ class MainMenu:
 
                 # self.__win.blit(coming_soon_logo, (self.__width / 4 - 150,
                 #                                    self.__height * (1 / 4) - 75))
-                self.__win.blit(coming_soon_logo, (self.__width * (3 / 4) - 100,
-                                                   self.__height * (3 / 4) - 75))
+                # self.__win.blit(coming_soon_logo, (self.__width * (3 / 4) - 100,
+                #                                   self.__height * (3 / 4) - 75))
         else:
             # Lose/Win screen if game ended
             # Draw win/lose logo
@@ -329,8 +331,9 @@ class MainMenu:
             self.draw_scores(115, 290, item_number_11, top_eleven)
 
             # Draw button for restarting game
-            self.__win.blit(play_again_logo, (self.__width * (3 / 4) - play_again_logo.get_width() / 2,
-                                              self.__height / 2 - play_again_logo.get_height() / 2 - 50))
+            try_again_logo = self.__big_text_font.render("Try again?", 1, (0, 0, 0))
+            self.__win.blit(try_again_logo, (self.__width * (3 / 4) - try_again_logo.get_width() / 2,
+                                             self.__height / 2 - try_again_logo.get_height() / 2 - 50))
             self.__win.blit(start_btn, (self.__btn[0] + self.__width / 4, self.__btn[1]))
 
         pygame.display.update()
